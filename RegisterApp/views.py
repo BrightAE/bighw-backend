@@ -1,4 +1,4 @@
-from django.shortcuts import render
+# from django.shortcuts import render
 
 # Create your views here.
 from django.http import HttpResponse
@@ -8,7 +8,8 @@ from UserApp.models import User
 import RegisterApp.send_email
 import random
 import string
-import time
+import json
+# import time
 
 # from django.views.decorators.csrf import csrf_exempt
 
@@ -23,13 +24,13 @@ def logon(request):
         return JsonResponse({"error": "require POST"})
     all_index = ['username', 'password', 'student_id', 'email', 'contact']
     for index in all_index:
-        if index not in request.Post or len(request.POST[index]) == 0:
+        if index not in request.POST or len(request.POST[index]) == 0:
             return JsonResponse({"error": "invalid parameters"})
 
     input_username = request.POST['username']
     input_password = request.POST['password']
     input_email = request.POST['email']
-    input_student_id = int(request.POST['id'])
+    input_student_id = int(request.POST['student_id'])
     input_contact = request.POST['contact']
 
     items = User.objects.all()
@@ -45,17 +46,18 @@ def logon(request):
     test.contact = input_contact
     test.authority = 'user'
     test.active = False
-    test.lab_info = ''
+    test.lab_info = ' '
     test.rand_str = ''
     test.save()
 
     items = User.objects.all()
     for item in items:
-        print(item.id, ' ', item.username, ' ', item.password, ' ', item.email, ' ', item.student_id, ' ', item.authority, ' ',
+        print(item.id, ' ', item.username, ' ', item.password, ' ', item.email,
+              ' ', item.student_id, ' ', item.authority, ' ',
               item.active)
 
     rand_str = RegisterApp.send_email.get_rand_str(40)
-    RegisterApp.send_email.send_register_email(test.mail, rand_str)
+    RegisterApp.send_email.send_register_email(test.email, rand_str)
 
     test.rand_str = rand_str
     test.save()
@@ -90,7 +92,7 @@ def login(request):
         return JsonResponse({"error": "require POST"})
     all_index = ['username', 'password']
     for index in all_index:
-        if index not in request.Post or len(request.POST[index]) == 0:
+        if index not in request.POST or len(request.POST[index]) == 0:
             return JsonResponse({"error": "invalid parameters"})
     login_username = request.POST['username']
     login_password = request.POST['password']
@@ -121,36 +123,102 @@ def login(request):
 def logout(request):
     if request.method != 'POST':
         return JsonResponse({"error": "require POST"})
-    print(request)
-    print(request.COOKIES['session_id'])
+    if not check_login(request):
+        return JsonResponse({"error": "please login"})
+    # print(request)
+    # print(request.COOKIES['session_id'])
+    # return JsonResponse({'error': 'TEST'})
+    saved_user = User.objects.get(rand_str=request.COOKIES['session_id'])
+    print("success logout: ", saved_user.username)
+    response = JsonResponse({'message': 'ok'})
+    saved_user.rand_str = ''
+    saved_user.save()
+    return response
 
-    saved_user = User.objects.filter(rand_str=request.COOKIES['session_id'])
-    if saved_user.exists():
-        saved_user = User.objects.get(rand_str=request.COOKIES['session_id'])
-        print("success logout: ", saved_user.username)
-        response = JsonResponse({'message': 'ok'})
-        saved_user.delete()
-        return response
 
-    return JsonResponse({'error': 'no valid session'})
-#
-#
-#
-# def logout(request):
-#     if request.method != 'POST':
-#         return JsonResponse({"error": "require POST"})
-#     print(request)
-#     print(request.COOKIES['session_id'])
-#
-#     saved_session = MySession.objects.filter(sessionID=request.COOKIES['session_id'])
-#     if saved_session.exists():
-#         saved_item = MySession.objects.get(sessionID=request.COOKIES['session_id'])
-#         print("success logout: ", saved_item.username)
-#         response = JsonResponse({saved_item.username: "the-old-user-name"})
-#         saved_item.delete()
-#         return response
-#
-#     return JsonResponse({'error': 'no valid session'})
+def query_all(request):
+    if request.method != 'GET':
+        return JsonResponse({"error": "require GET"})
+
+    if not check_login(request):
+        return JsonResponse({"error": "please login"})
+    saved_user = User.objects.get(rand_str=request.COOKIES['session_id'])
+    if saved_user.authority != 'admin':
+        return JsonResponse({"error": "not admin"})
+    print("admin querying ALL: ", saved_user.username)
+
+    filt = request.GET['filter']
+    page_id = int(request.GET['page'])
+    page_size = int(request.GET['page_size'])
+    result_list = User.objects.all()
+    if filt == 'lessor':
+        result_list = User.objects.filter(authority='lessor')
+    left = min(len(result_list), (page_id-1)*page_size)
+    right = min(len(result_list), page_id*page_size)
+    return_list = []
+    i = left
+    while i < right:
+        tmp = result_list[i]
+        return_list.append({'username': tmp.username, 'student_id': tmp.student_id, 'user_id': tmp.id,
+                            'email': tmp.email, 'contact': tmp.contact, 'authority': tmp.authority,
+                            'lab_info': tmp.lab_info})
+        i += 1
+
+    # return JsonResponse(json.dumps(return_list, separators=(',', ':'), indent=4))
+    return JsonResponse({'total': len(result_list), 'users': return_list})
+
+
+def set_authority(request):
+    if request.method != 'POST':
+        return JsonResponse({"error": "require POST"})
+
+    if not check_login(request):
+        return JsonResponse({"error": "please login"})
+    saved_user = User.objects.get(rand_str=request.COOKIES['session_id'])
+    if saved_user.authority != 'admin':
+        return JsonResponse({"error": "not admin"})
+    print("admin setting authority: ", saved_user.username)
+    all_index = ['user_id', 'authority']
+    for index in all_index:
+        if index not in request.POST or len(request.POST[index]) == 0:
+            return JsonResponse({"error": "invalid parameters"})
+    user_id = request.POST['user_id']
+    authority = request.POST['authority']
+    if not User.objects.filter(id=user_id).exists():
+        return JsonResponse({"error": "no such user"})
+    set_user = User.objects.get(id=user_id)
+    set_user.authority = authority
+    set_user.save()
+
+    return JsonResponse({'message': 'ok'})
+
+
+def delete_user(request):
+    if request.method != 'POST':
+        return JsonResponse({"error": "require POST"})
+
+    if not check_login(request):
+        return JsonResponse({"error": "please login"})
+    saved_user = User.objects.get(rand_str=request.COOKIES['session_id'])
+    if saved_user.authority != 'admin':
+        return JsonResponse({"error": "not admin"})
+    print("admin setting authority: ", saved_user.username)
+    if 'user_id' not in request.POST or len(request.POST['user_id']) == 0:
+        return JsonResponse({"error": "invalid parameters"})
+    user_id = request.POST['user_id']
+    if not User.objects.filter(id=user_id).exists():
+        return JsonResponse({"error": "no such user"})
+    set_user = User.objects.get(id=user_id)
+    set_user.delete()
+
+    return JsonResponse({'message': 'ok'})
+
+
+def check_login(request):
+    return 'session_id' in request.COOKIES and len(request.COOKIES['session_id']) > 0\
+           and User.objects.filter(rand_str=request.COOKIES['session_id']).exists()
+
+
 #
 #
 # def record_add(request):

@@ -13,6 +13,6 @@ def get_rand_str(length):
 
 def send_register_email(to, rand_str):
     title = "注册激活链接"
-    body = "请点击下面的链接激活你的账号: http://127.0.0.1:8000/active/{0}".format(rand_str)
+    body = "请点击下面的链接激活你的账号: http://127.0.0.1:8000/api/active/{0}".format(rand_str)
     print(body)
     send_mail(title, body, settings.DEFAULT_FROM_EMAIL, [to])
