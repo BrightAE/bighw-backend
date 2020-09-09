@@ -2,6 +2,9 @@
 
 filter是虚的，拆开的话不留filter
 
+所有的page都默认为1, page_size 默认为20
+没有错误信息的返回的 error 为 None
+
 #### 1. 平台管理员 + 平台本身
 
 设备租赁与平台的管理员，负责所有设备的申报审批、用户管理工作
@@ -31,6 +34,7 @@ filter是虚的，拆开的话不留filter
    			'lab_info': ''
    		}
    	]
+   	'error':
    }
    ```
 
@@ -46,7 +50,8 @@ filter是虚的，拆开的话不留filter
    }
    Response
    {
-   	'message': 'ok' / 'error' //有设备关联而不能删除该用户
+   	'message': 'ok'
+   	'error': '' //有设备关联而不能删除该用户
    }
    ```
 
@@ -61,7 +66,8 @@ filter是虚的，拆开的话不留filter
    }
    Response
    {
-   	'message' : 'ok' / 'error' //有设备关联而不能删除该用户
+   	'message' : 'ok' 
+   	'error': '' //有设备关联而不能删除该用户
    }
    ```
 
@@ -96,6 +102,7 @@ filter是虚的，拆开的话不留filter
    			'username': ''
    		}
    	]
+   	'error': ''
    }
    ```
 
@@ -108,7 +115,7 @@ filter是虚的，拆开的话不留filter
    {
    	'equip_id': 
    	'set_info': {   //均是可选传
-           'name': ''
+           'equip_name': ''
            'address': ''
            'end_time': ''
            'status': '' 
@@ -116,7 +123,8 @@ filter是虚的，拆开的话不留filter
    }
    Response:
    {
-   	'message': 'ok' / 'error'
+   	'message': 'ok'
+   	'error': ''
    }
    
    ```
@@ -132,7 +140,8 @@ filter是虚的，拆开的话不留filter
    }
    Response:
    {
-   	'message': 'ok' / 'error' //可能会出现设备正出租而无法删除的情况
+   	'message': 'ok'
+   	'error':  ''//可能会出现设备正出租而无法删除的情况
    }
    ```
 
@@ -166,6 +175,7 @@ filter是虚的，拆开的话不留filter
    			'status': 'returned' / 'unreturned'
    		}
    	]
+   	'error': ''
    }
    ```
 
@@ -202,6 +212,7 @@ filter是虚的，拆开的话不留filter
    		'end_time': ''
    		'status': 'returned' / 'unreturned'
    	]
+   	'error': ''
    }
    ```
 
@@ -228,6 +239,7 @@ filter是虚的，拆开的话不留filter
    		'equip_name': ''
    		'end_time': ''
    	]
+   	'error': ''
    }
    ```
 
@@ -235,19 +247,20 @@ filter是虚的，拆开的话不留filter
 
 10. 管理员审核上架申请：
 
-    ```
-    Method: POST
-    url: api/equip/request/decide
-    Request:
-    {
-    	'sale_req_id':
-    	'decision': 'apply' / 'reject'
-    }
-    Response:
-    {
-    	'message': 'ok' / 'error'
-    }
-    ```
+   ```
+   Method: POST
+   url: api/equip/request/decide
+   Request:
+   {
+   	'sale_req_id':
+   	'decision': 'apply' / 'reject'
+   }
+   Response:
+   {
+   	'message': 'ok'
+   	'error': ''
+   }
+   ```
 
 11. 管理员审核租借申请：
 
@@ -261,7 +274,8 @@ filter是虚的，拆开的话不留filter
     }
     Response:
     {
-    	'message': 'ok' / 'error'
+    	'message': 'ok'
+    	'error': ''
     }
     ```
 
@@ -278,7 +292,8 @@ filter是虚的，拆开的话不留filter
     }
     Response:
     {
-    	'message': 'ok' / 'error'
+    	'message': 'ok'
+    	'error': ''
     }
     ```
 
@@ -297,7 +312,8 @@ filter是虚的，拆开的话不留filter
     }
     Response:
     {
-    	'message': 'ok' / 'error'
+    	'message': 'ok'
+    	'error': ''
     }
     ```
 
@@ -313,7 +329,8 @@ filter是虚的，拆开的话不留filter
     }
     Response:
     {
-    	'message': 'ok' / 'error'
+    	'message': 'ok'
+    	'error': ''
     }
     登录cookie在响应头中，名为'session_id'
     ```
@@ -329,7 +346,8 @@ filter是虚的，拆开的话不留filter
     }
     Response：
     {
-    	'message': 'ok' / 'error'
+    	'message': 'ok'
+    	'error': ''
     }
     ```
 
@@ -344,6 +362,11 @@ filter是虚的，拆开的话不留filter
     {
     	'rand_str': ''
     }
+    Response:
+    {
+    	'message': 'ok'
+    	'error': ''
+    }
     ```
 
 17. 获取当前登录的用户信息
@@ -357,6 +380,7 @@ filter是虚的，拆开的话不留filter
     	'student_id':
     	'username': ‘'
     	'authority': ''
+    	'error': ''
     }
     ```
 
@@ -374,7 +398,8 @@ filter是虚的，拆开的话不留filter
     }
     Response：
     {
-    	'message': 'ok' / 'error'
+    	'message': 'ok'
+    	'error': ''
     }
     ```
 
@@ -395,6 +420,7 @@ filter是虚的，拆开的话不留filter
    	'detail':
    	'contact':
    	'return_time':
+   	'error': ''
    }
    ```
 
@@ -413,10 +439,9 @@ filter是虚的，拆开的话不留filter
    url: api/user/auth/add
    Request:
    {
-   	'user_id':
-   	'username': ''
    	'lab_info': ''
    	'detail': ''
+   	'error': ''
    }
    ```
 
@@ -446,7 +471,8 @@ filter是虚的，拆开的话不留filter
    }
    Response:
    {
-   	message: 'ok' / 'error'
+   	message: 'ok'
+   	'error': ''
    }
    ```
 
@@ -462,7 +488,8 @@ filter是虚的，拆开的话不留filter
    }
    Response:
    {
-   	'message': 'ok' / 'error'
+   	'message': 'ok'
+   	'error': ''
    }
    ```
 
@@ -489,9 +516,10 @@ filter是虚的，拆开的话不留filter
    }
    Response:
    {
-   	'message': 'ok' / 'error'
+   	'message': 'ok'
+       'error': ''
    }
-   ```
-
+```
+   
    
 

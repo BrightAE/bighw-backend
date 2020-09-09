@@ -26,5 +26,6 @@ urlpatterns = [
     url(r'^api/active/(.+)$', views.active),
     url(r'^api/login$', views.login),
     url(r'^api/logout$', views.logout),
-    url(r'^equip/query$', EquipmentApp.views.query),
+    url(r'^api/equip/query$', EquipmentApp.views.equip_query),
+    url(r'^api/equip/set$', EquipmentApp.views.equip_set),
 ]
