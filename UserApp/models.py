@@ -13,3 +13,9 @@ class User(models.Model):
     rand_str = models.CharField(max_length=233)
     contact = models.CharField(default=None)
     lab_info = models.CharField(default=None)
+
+class AuthrityRequest(models.Model):
+    user_id = models.IntegerField()
+    username = models.CharField(max_length=20)
+    lab_info = models.CharField()
+    detail = models.CharField()
