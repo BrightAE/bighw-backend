@@ -149,13 +149,16 @@ filter是虚的，拆开的话不留filter
 
    ```
    Method: GET
-   url: api/rent
+   url: api/rent/query
    QueryParam:
    {
    	'filter': {
    		'equip_id':
    		'lessor_id':
    		'user_id':
+   		‘equip_name': ''
+   		'lessor_name': ''
+   		'username': ''
    	}
    	'page_size':
    	'page':
@@ -285,7 +288,7 @@ filter是虚的，拆开的话不留filter
 
     ```
     Method: POST
-    url: api/rent/delete
+    url: api/rent/request/delete
     Request:
     {
     	'rent_req_id':
@@ -413,7 +416,7 @@ filter是虚的，拆开的话不留filter
 
    ```
    Method: POST
-   url: api/rent/request
+   url: api/rent/request/add
    request:
    {
    	'equip_id':
