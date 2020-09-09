@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
 from UserApp.models import User
-from django.contrib.auth.hashers import make_password, check_password
+# from django.contrib.auth.hashers import make_password, check_password
 import RegisterApp.send_email
 import random
 import string
@@ -39,7 +39,7 @@ def logon(request):
 
     test = User()
     test.username = input_username
-    test.password = make_password(input_password)
+    test.password = input_password
     test.student_id = input_student_id
     test.email = input_email
     test.contact = input_contact
@@ -127,9 +127,9 @@ def logout(request):
     saved_user = User.objects.filter(rand_str=request.COOKIES['session_id'])
     if saved_user.exists():
         saved_user = User.objects.get(rand_str=request.COOKIES['session_id'])
-        print("success logout: ", saved_item.username)
-        response = JsonResponse({saved_item.username: "the-old-user-name"})
-        saved_item.delete()
+        print("success logout: ", saved_user.username)
+        response = JsonResponse({'message': 'ok'})
+        saved_user.delete()
         return response
 
     return JsonResponse({'error': 'no valid session'})

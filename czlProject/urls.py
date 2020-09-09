@@ -21,13 +21,8 @@ from django.conf.urls import url
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^helloworld$', views.hello_world),
-    url(r'^logon$', views.logon),
-    url(r'^login$', views.login),
-    url(r'^logout$', views.logout),
-    url(r'^record/add$', views.record_add),
-    url(r'^record/(.+)/delete$', views.record_delete),
-    url(r'^record/(.+)/update$', views.record_update),
-    url(r'^record/query$', views.record_query),
-    url(r'^record/(.+)$', views.record_get),
-    url(r'^active/(.+)$', views.active),
+    url(r'^api/logon$', views.logon),
+    url(r'^api/active/(.+)$', views.active),
+    url(r'^api/login$', views.login),
+    url(r'^api/logout$', views.logout),
 ]
