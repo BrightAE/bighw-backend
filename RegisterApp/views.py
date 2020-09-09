@@ -3,7 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.http import HttpResponse
 from django.http import JsonResponse
-from .models import User
+from UserApp.models import User
 from django.contrib.auth.hashers import make_password, check_password
 import RegisterApp.send_email
 import random
@@ -66,14 +66,14 @@ def logon(request):
 def active(request, rand_str):
     if request.method != 'GET':
         return JsonResponse({"error": "require GET"})
-    saved_account = User.objects.filter(rand_str=rand_str)
-    if not saved_account.exists():
+    saved_user = User.objects.filter(rand_str=rand_str)
+    if not saved_user.exists():
         return JsonResponse({'error:': "no such Register Apply"})
-    saved_account = User.objects.get(rand_str=rand_str)
+    saved_user = User.objects.get(rand_str=rand_str)
     # print(saved_account.username)
-    saved_account.active = 1
-    saved_account.rand_str = ''
-    saved_account.save()
+    saved_user.active = 1
+    saved_user.rand_str = ''
+    saved_user.save()
     # print(saved_account.active)
     return JsonResponse({"message": "ok"})
 
@@ -118,43 +118,22 @@ def login(request):
     return response
 
 
+def logout(request):
+    if request.method != 'POST':
+        return JsonResponse({"error": "require POST"})
+    print(request)
+    print(request.COOKIES['session_id'])
+
+    saved_user = User.objects.filter(rand_str=request.COOKIES['session_id'])
+    if saved_user.exists():
+        saved_user = User.objects.get(rand_str=request.COOKIES['session_id'])
+        print("success logout: ", saved_item.username)
+        response = JsonResponse({saved_item.username: "the-old-user-name"})
+        saved_item.delete()
+        return response
+
+    return JsonResponse({'error': 'no valid session'})
 #
-# def login(request):
-#     if request.method != 'POST':
-#         return JsonResponse({"error": "require POST"})
-#     if 'username' not in request.POST:
-#         return JsonResponse({"error": "no such a user"})
-#     if 'password' not in request.POST:
-#         return JsonResponse({"error": "password is wrong"})
-#     login_username = request.POST['username']
-#     login_password = request.POST['password']
-#
-#     items = Account.objects.all()
-#     for item in items:
-#         print(item.id, ' ', item.username, ' ', item.password)
-#
-#     items = MySession.objects.all()
-#     for item in items:
-#         print(item.sessionID, ' ', item.username)
-#
-#     test_exist = Account.objects.filter(username=login_username)
-#     if (len(login_username) == 0) or (not test_exist.exists()):
-#         return JsonResponse({"error": "no such a user"})
-#
-#     saved_obj = Account.objects.get(username=login_username)
-#     if not check_password(login_password, saved_obj.password):
-#         return JsonResponse({"error": "password is wrong"})
-#
-#     saved_session = MySession.objects.filter(username=login_username)
-#     if saved_session.exists():
-#         return JsonResponse({'error': 'has logged in'})
-#
-#     rand_str = get_rand_str(88)
-#     response = JsonResponse({login_username: "the-user-name"})
-#     response.set_cookie('session_id', rand_str)
-#     # response['Set-Cookie'] = 'session_id='+rand_str
-#     create_session(rand_str, login_username)
-#     return response
 #
 #
 # def logout(request):
