@@ -313,8 +313,9 @@ filter是虚的，拆开的话不留filter
     }
     Response:
     {
-    	'session_id': ''
+    	'message': 'ok' / 'error'
     }
+    登录cookie在响应头中，名为'session_id'
     ```
 
 15. 登出
@@ -493,3 +494,4 @@ filter是虚的，拆开的话不留filter
    ```
 
    
+

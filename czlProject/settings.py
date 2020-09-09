@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'RegisterApp',
     'UserApp',
+    'EquipmentApp',
+    'RentApp',
 ]
 
 MIDDLEWARE = [
