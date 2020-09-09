@@ -24,12 +24,16 @@ def judge_manager(request):
     except:
         return False
 
-def query(request):
-    if request.method == 'POST':
+def equip_query(request):
+    if request.method == 'GET':
         if judge_cookie(request) == False:
             return HttpResponse(json.dumps({"error": "please login"}))
         filter = {}
-        lessor = User.objects.get(rand_str=request.COOKIES['session_id'])
+        session_id = request.COOKIES['session_id']
+        print(session_id)
+        for user in User.objects.all():
+            print(user.rand_str)
+        lessor = User.objects.get(rand_str=session_id)
         try:
             filter['status'] = request.GET.get('status')
         except:
@@ -49,19 +53,30 @@ def query(request):
             filter['name_search'] = None
         if judge_manager(request) == False:
             filter['lessor_name'] = lessor.username
+        nFilter = {}
         for filter_item in filter:
-            if filter[filter_item] == None:
-                del filter[filter_item]
-        results = Equipment.objects.filter(**filter)
+            if filter[filter_item] != None:
+                nFilter[filter_item] = filter[filter_item]
         page = request.GET.get('page')
+        if page == None or page.isdigit() == False:
+            page = 1
+        else:
+            page = int(page)
         page_size = request.GET.get('page_size')
+        if page_size == None or page_size.isdigit() == False:
+            page_size = 20
+        else:
+            page_size = int(page_size)
+        nFilter['id__gte'] = (page - 1) * page_size
+        nFilter['id__lt'] = page * page_size
+        results = Equipment.objects.filter(**nFilter)
         total = len(results)
-        results = results[(page-1)*page_size:page*page_size]
+        # results = results[(page-1)*page_size:page*page_size]
         equip = []
         for item in results:
             equip.append({
                 'equip_id': item.id,
-                'equip_name': item.name,
+                'equip_name': item.equip_name,
                 'lessor_name': item.lessor_name,
                 'address': item.address,
                 'end_time': item.end_time,
@@ -70,6 +85,29 @@ def query(request):
                 'username': item.username
             })
         return JsonResponse({'total': total, 'equip': equip})
+    return JsonResponse({"error": "wrong request method"})
 
-
-    return HttpResponse(json.dumps({"error": "wrong request method"}))
+def equip_set(request):
+    if request.method == 'POST':
+        if judge_cookie(request) == False:
+            return JsonResponse({"error": "please login"})
+        try:
+            equip_id = request.POST.get('equip_id')
+        except:
+            return JsonResponse({"error": "no such a equipment"})
+        try:
+            equip = Equipment.objects.get(equip_id=equip_id)
+            user = User.objects.get(rand_str=request.COOKIES['session_id'])
+            if user.username != equip.lessor_name:
+                raise RuntimeError
+        except:
+            return JsonResponse({"error": "this is not your equipment"})
+        try:
+            set_info = request.POST.get('set_info')
+        except:
+            return JsonResponse({"error": "no avaliable change"})
+        for item in set_info:
+            equip[item] = set_info[item]
+        equip.save()
+        return JsonResponse({"message": "ok"})
+    return JsonResponse({"error": "wrong request method"})
