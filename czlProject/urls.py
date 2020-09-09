@@ -28,4 +28,9 @@ urlpatterns = [
     url(r'^api/logout$', views.logout),
     url(r'^api/equip/query$', EquipmentApp.views.equip_query),
     url(r'^api/equip/set$', EquipmentApp.views.equip_set),
+    url(r'^api/equip/delete$', EquipmentApp.views.equip_delete),
+    url(r'^api/equip/request/query', EquipmentApp.views.equip_request_query),
+    url(r'^api/equip/request/decide', EquipmentApp.views.equip_request_decide),
+    url(r'^api/equip/add', EquipmentApp.views.equip_add),
+    url(r'api/equip/request/add', EquipmentApp.views.equip_request_add),
 ]

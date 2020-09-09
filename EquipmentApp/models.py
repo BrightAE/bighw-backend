@@ -18,3 +18,4 @@ class SaleRequest(models.Model):
     equip_name = models.CharField(max_length=50)
     end_time = models.TimeField()
     lessor_name = models.CharField(max_length=20)
+    status = models.CharField(max_length=10)

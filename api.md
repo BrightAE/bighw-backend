@@ -234,7 +234,7 @@ filter是虚的，拆开的话不留filter
    Response:
    {
    	'total':
-   	'equips': [
+   	'equip_req': [
    		'equip_id':
    		'equip_name': ''
    		'end_time': ''
@@ -519,7 +519,10 @@ filter是虚的，拆开的话不留filter
    	'message': 'ok'
        'error': ''
    }
+   ```
 ```
    
    
 
+
+```
