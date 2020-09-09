@@ -7,22 +7,21 @@ from .models import Equipment, SaleRequest
 
 
 def judge_cookie(request):
-    return True
     try:
         saved_user = User.objects.filter(rand_str=request.COOKIES['session_id'])
         if not saved_user.exists():
             return False
-    except:
+        return True
+    except Exception:
         return False
 
 
 def judge_manager(request):
-    return True
     try:
         saved_user = User.objects.get(rand_str=request.COOKIES['session_id'])
         if not saved_user.authority == 'admin':
-            return False
-    except:
+            return True
+    except Exception:
         return False
 
 
