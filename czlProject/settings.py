@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'RegisterApp',
     'UserApp',
     'EquipmentApp',
@@ -50,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'czlProject.urls'
@@ -125,3 +127,5 @@ EMAIL_PORT = 465
 EMAIL_HOST_USER = '1764320683@qq.com'  # 帐号
 EMAIL_HOST_PASSWORD = 'fxsakujgypyibafe'  # 密码
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+CORS_ORIGIN_ALLOW_ALL = True

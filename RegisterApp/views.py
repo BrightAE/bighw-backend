@@ -23,6 +23,7 @@ def logon(request):
     if request.method != 'POST':
         return JsonResponse({"error": "require POST"})
     all_index = ['username', 'password', 'student_id', 'email', 'contact']
+    print(request.POST['email'])
     for index in all_index:
         if index not in request.POST or len(request.POST[index]) == 0:
             return JsonResponse({"error": "invalid parameters"})
