@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from RegisterApp import views
 from django.conf.urls import url
+import EquipmentApp.views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,4 +31,5 @@ urlpatterns = [
     url(r'^record/query$', views.record_query),
     url(r'^record/(.+)$', views.record_get),
     url(r'^active/(.+)$', views.active),
+    url(r'^equip/query$', EquipmentApp.views.query),
 ]
