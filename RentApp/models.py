@@ -10,7 +10,7 @@ class RentRequest(models.Model):
     equip_id = models.IntegerField()
     status = models.CharField(max_length=20)
     detail = models.CharField(max_length=200)
-    contact = models.CharField(max_length=200)
+    start_time = models.TimeField()
     return_time = models.TimeField()
 
 
