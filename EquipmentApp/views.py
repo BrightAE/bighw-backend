@@ -1,74 +1,73 @@
 from django.shortcuts import render
 
 # Create your views here.
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from UserApp.models import User
 from .models import Equipment, SaleRequest
-import json
+
 
 def judge_cookie(request):
-    return True
     try:
         saved_user = User.objects.filter(rand_str=request.COOKIES['session_id'])
         if not saved_user.exists():
             return False
-    except:
+        return True
+    except Exception:
         return False
 
+
 def judge_manager(request):
-    return True
     try:
         saved_user = User.objects.get(rand_str=request.COOKIES['session_id'])
         if not saved_user.authority == 'admin':
-            return False
-    except:
+            return True
+    except Exception:
         return False
+
+
+def parse_int(instr, deft):
+    if instr is None or instr.isdigit() is False:
+        ret = deft
+    else:
+        ret = int(instr)
+    return ret
+
+
+def get_filter(request, filter_eles):
+    my_filter = {}
+    for name in filter_eles:
+        if name in request.GET:
+            my_filter[name] = request.GET.get(name)
+            if filter_eles[name] == 'int':
+                my_filter[name] = int(my_filter[name])
+    return my_filter
+
 
 def equip_query(request):
     if request.method == 'GET':
-        if judge_cookie(request) == False:
-            return HttpResponse(json.dumps({"error": "please login"}))
-        filter = {}
+        if judge_cookie(request) is False:
+            return JsonResponse({"error": "please login"})
         session_id = request.COOKIES['session_id']
         lessor = User.objects.get(rand_str=session_id)
+        filter_eles = {
+            'status': 'str',
+            'lessor_name': 'str',
+            'lessor_id': 'int',
+            'name_search': 'str',
+        }
         try:
-            filter['status'] = request.GET.get('status')
-        except:
-            filter['status'] = None
-        try:
-            filter['lessor_name'] = request.GET.get('lessor_name')
-        except:
-            filter['lessor_name'] = None
-        try:
-            filter['lessor_id'] = request.GET.get('lessor_id')
-            filter['lessor_id'] = int(filter['lessor_id'])
-        except:
-            filter['lessor_id'] = None
-        try:
-            filter['name_search'] = request.GET.get('name_search')
-        except:
-            filter['name_search'] = None
-        if judge_manager(request) == False:
-            filter['lessor_name'] = lessor.username
-        nFilter = {}
-        for filter_item in filter:
-            if filter[filter_item] != None:
-                nFilter[filter_item] = filter[filter_item]
-        page = request.GET.get('page')
-        if page == None or page.isdigit() == False:
-            page = 1
-        else:
-            page = int(page)
-        page_size = request.GET.get('page_size')
-        if page_size == None or page_size.isdigit() == False:
-            page_size = 20
-        else:
-            page_size = int(page_size)
-        nFilter['id__gte'] = (page - 1) * page_size
-        nFilter['id__lt'] = page * page_size
-        results = Equipment.objects.filter(**nFilter)
+            my_filter = get_filter(request, filter_eles)
+        except Exception:
+            return JsonResponse({"error": "invalid filter parameters"})
+        if judge_manager(request) is False:
+            my_filter['lessor_name'] = lessor.username
+        results = Equipment.objects.filter(**my_filter)
         total = len(results)
-        # results = results[(page-1)*page_size:page*page_size]
+        page = parse_int(request.GET.get('page'), 1)
+        page_size = parse_int(request.GET.get('page_size'), 20)
+        my_filter['id__gte'] = (page - 1) * page_size
+        my_filter['id__lt'] = page * page_size
+        results = Equipment.objects.filter(**my_filter)
         equip = []
         for item in results:
             equip.append({
@@ -84,24 +83,25 @@ def equip_query(request):
         return JsonResponse({'total': total, 'equip': equip})
     return JsonResponse({"error": "wrong request method"})
 
+
 def equip_set(request):
     if request.method == 'POST':
-        if judge_cookie(request) == False:
+        if judge_cookie(request) is False:
             return JsonResponse({"error": "please login"})
         try:
             equip_id = request.POST.get('equip_id')
-        except:
+        except Exception:
             return JsonResponse({"error": "no such a equipment"})
         try:
-            equip = Equipment.objects.get(equip_id=equip_id)
+            equip = Equipment.objects.get(id=equip_id)
             user = User.objects.get(rand_str=request.COOKIES['session_id'])
             if user.username != equip.lessor_name:
                 raise RuntimeError
-        except:
+        except Exception:
             return JsonResponse({"error": "this is not your equipment"})
         try:
             set_info = request.POST.get('set_info')
-        except:
+        except Exception:
             return JsonResponse({"error": "no avaliable change"})
         for item in set_info:
             equip[item] = set_info[item]
@@ -109,33 +109,35 @@ def equip_set(request):
         return JsonResponse({"message": "ok"})
     return JsonResponse({"error": "wrong request method"})
 
+
 def equip_delete(request):
     if request.method == 'POST':
-        if judge_cookie(request) == False:
+        if judge_cookie(request) is False:
             return JsonResponse({"error": "please login"})
         try:
             equip_id = request.POST.get('equip_id')
-        except:
+        except Exception:
             return JsonResponse({"error": "no such a equipment"})
         try:
-            equip = Equipment.objects.get(equip_id=equip_id)
+            equip = Equipment.objects.get(id=equip_id)
             user = User.objects.get(rand_str=request.COOKIES['session_id'])
             if user.username != equip.lessor_name:
                 raise RuntimeError
-        except:
+        except Exception:
             return JsonResponse({"error": "this is not your equipment"})
         equip.delete()
         return JsonResponse({"message": "ok"})
     return JsonResponse({"error": "wrong request method"})
 
+
 def equip_add(request):
     if request.method == 'POST':
-        if judge_cookie(request) == False:
+        if judge_cookie(request) is False:
             return JsonResponse({"error": "please login"})
         try:
             equip_name = request.POST.get('equip_name')
             address = request.POST.get('address')
-        except:
+        except Exception:
             return JsonResponse({"error": "invalid parameters"})
         user = User.objects.get(rand_str=request.COOKIES['session_id'])
         equip = Equipment()
@@ -143,49 +145,34 @@ def equip_add(request):
         equip.lessor_name = user.username
         equip.address = address
         equip.contact = user.contact
-        equip.status = 'pending'
+        equip.status = 'unavailable'
         equip.save()
         return JsonResponse({"message": "ok"})
     return JsonResponse({"error": "wrong request method"})
 
+
 def equip_request_query(request):
     if request.method == 'GET':
-        if judge_cookie(request) == False:
+        if judge_cookie(request) is False:
             return JsonResponse({"error": "please login"})
-        filter = {}
         lessor = User.objects.get(rand_str=request.COOKIES['session_id'])
+        filter_eles = {
+            'lessor_name': 'str',
+            'equip_name': 'str',
+        }
         try:
-            filter['lessor_name'] = request.GET.get('lessor_name')
-        except:
-            filter['lessor_name'] = None
-        try:
-            filter['lessor_id'] = request.GET.get('lessor_id')
-        except:
-            filter['lessor_id'] = None
-        try:
-            filter['equip_name'] = request.GET.get('equip_name')
-        except:
-            filter['equip_name'] = None
-        if judge_manager(request) == False:
-            filter['lessor_name'] = lessor.username
-        nFilter = {}
-        for filter_item in filter:
-            if filter[filter_item] != None:
-                nFilter[filter_item] = filter[filter_item]
-        page = request.GET.get('page')
-        if page == None or page.isdigit() == False:
-            page = 1
-        else:
-            page = int(page)
-        page_size = request.GET.get('page_size')
-        if page_size == None or page_size.isdigit() == False:
-            page_size = 20
-        else:
-            page_size = int(page_size)
-        nFilter['id__gte'] = (page - 1) * page_size
-        nFilter['id__lt'] = page * page_size
-        results = SaleRequest.objects.filter(**nFilter)
+            my_filter = get_filter(request, filter_eles)
+        except Exception:
+            return JsonResponse({"error": "invaild filter parameters"})
+        if judge_manager(request) is False:
+            my_filter['lessor_name'] = lessor.username
+        results = SaleRequest.objects.filter(**my_filter)
         total = len(results)
+        page = parse_int(request.GET.get('page'), 1)
+        page_size = parse_int(request.GET.get('page_size'), 20)
+        my_filter['id__gte'] = (page - 1) * page_size
+        my_filter['id__lt'] = page * page_size
+        results = SaleRequest.objects.filter(**my_filter)
         equip_req = []
         for item in results:
             equip_req.append({
@@ -196,46 +183,55 @@ def equip_request_query(request):
         return JsonResponse({"total": total, "equip_req": equip_req})
     return JsonResponse({"error": "wrong request method"})
 
+
 def equip_request_decide(request):
     if request.method == 'POST':
-        if judge_cookie(request) == False:
+        if judge_cookie(request) is False:
             return JsonResponse({"error": "please login"})
         try:
             sale_req_id = request.POST.get('sale_req_id')
-        except:
+        except Exception:
             return JsonResponse({"error": "no such a sale request"})
         try:
             decision = request.POST.get('decision')
-        except:
+        except Exception:
             return JsonResponse({"error": "invalid decision"})
         try:
             sale_req = SaleRequest.objects.get(id=sale_req_id)
-        except:
+        except Exception:
             return JsonResponse({"error": "no such a sale request"})
-        sale_req.status = 'apply'
-        equip = Equipment.objects.get(id = sale_req.equip_id)
-        equip.status = 'onsale'
-        equip.end_time = sale_req.end_time
-        equip.save()
-        sale_req.save()
-        return JsonResponse({"message": "ok"})
+        equip = Equipment.objects.get(id=sale_req.equip_id)
+        if decision == 'reject':
+            sale_req.status = 'reject'
+            sale_req.save()
+            return JsonResponse({"message": "ok"})
+        elif decision == 'apply':
+            sale_req.status = 'apply'
+            equip.status = 'onsale'
+            equip.end_time = sale_req.end_time
+            equip.save()
+            sale_req.save()
+            return JsonResponse({"message": "ok"})
+        else:
+            return JsonResponse({"error": "invalid decision"})
     return JsonResponse({"error": "wrong request method"})
+
 
 def equip_request_add(request):
     if request.method == 'POST':
-        if judge_cookie(request) == False:
+        if judge_cookie(request) is False:
             return JsonResponse({"error": "please login"})
         try:
             equip_id = request.POST.get('equip_id')
             end_time = request.POST.get('end_time')
-        except:
+        except Exception:
             return JsonResponse({"error": "invalid parameters"})
         try:
             equip = Equipment.objects.get(id=equip_id)
-        except:
+        except Exception:
             return JsonResponse({"error": "no such a equipment"})
         user = User.objects.get(rand_str=request.COOKIES['session_id'])
-        if user.username !=equip.lessor_name:
+        if user.username != equip.lessor_name:
             return JsonResponse({"error": "this is not your equipment"})
         sale_req = SaleRequest()
         sale_req.equip_id = equip_id

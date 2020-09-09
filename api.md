@@ -210,9 +210,9 @@ filter是虚的，拆开的话不留filter
    		'equip_name': ''
    		'lessor_name': ''
    		'username': ''
-   		'rent_time': ''
+   		'start_time': ''
    		'return_time': ''
-   		'end_time': ''
+   		'detail': ''
    		'status': 'returned' / 'unreturned'
    	]
    	'error': ''
@@ -230,7 +230,6 @@ filter是虚的，拆开的话不留filter
    	'end_time': ''
    	'filter': { //可选传 自行拆开+2
    		'lessor_name': ''
-   		'lessor_id': 
    		'equip_name': ''
    	}
    }
@@ -245,9 +244,9 @@ filter是虚的，拆开的话不留filter
    	'error': ''
    }
    ```
-
    
 
+   
 10. 管理员审核上架申请：
 
    ```
@@ -423,6 +422,10 @@ filter是虚的，拆开的话不留filter
    	'detail':
    	'contact':
    	'return_time':
+   }
+   Response
+   {
+   	'message': 'ok'
    	'error': ''
    }
    ```
