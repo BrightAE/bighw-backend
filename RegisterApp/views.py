@@ -3,12 +3,12 @@
 # Create your views here.
 from django.http import HttpResponse
 from django.http import JsonResponse
-from UserApp.models import User
+from UserApp.models import User, AuthorityRequest
 # from django.contrib.auth.hashers import make_password, check_password
 import RegisterApp.send_email
 import random
 import string
-import json
+# import json
 # import time
 
 # from django.views.decorators.csrf import csrf_exempt
@@ -186,6 +186,8 @@ def set_authority(request):
     authority = request.POST['authority']
     if not User.objects.filter(id=user_id).exists():
         return JsonResponse({"error": "no such user"})
+    if authority not in ['user', 'lessor']:
+        return JsonResponse({"error": "no such authority"})
     set_user = User.objects.get(id=user_id)
     set_user.authority = authority
     set_user.save()
@@ -202,14 +204,78 @@ def delete_user(request):
     saved_user = User.objects.get(rand_str=request.COOKIES['session_id'])
     if saved_user.authority != 'admin':
         return JsonResponse({"error": "not admin"})
-    print("admin setting authority: ", saved_user.username)
+    print("admin deleting: ", saved_user.username)
     if 'user_id' not in request.POST or len(request.POST['user_id']) == 0:
         return JsonResponse({"error": "invalid parameters"})
     user_id = request.POST['user_id']
     if not User.objects.filter(id=user_id).exists():
         return JsonResponse({"error": "no such user"})
-    set_user = User.objects.get(id=user_id)
-    set_user.delete()
+    del_user = User.objects.get(id=user_id)
+    del_user.delete()
+
+    return JsonResponse({'message': 'ok'})
+
+
+def user_info(request):
+    if request.method != 'GET':
+        return JsonResponse({"error": "require GET"})
+
+    if not check_login(request):
+        return JsonResponse({"error": "please login"})
+    user = User.objects.get(rand_str=request.COOKIES['session_id'])
+
+    return JsonResponse({'user_id': user.id, 'student_id': user.student_id, 'username': user.username,
+                         'authority': user.authority})
+
+
+def decide_auth_request(request):
+    if request.method != 'POST':
+        return JsonResponse({"error": "require POST"})
+
+    if not check_login(request):
+        return JsonResponse({"error": "please login"})
+    saved_user = User.objects.get(rand_str=request.COOKIES['session_id'])
+    if saved_user.authority != 'admin':
+        return JsonResponse({"error": "not admin"})
+    print("admin deciding auth: ", saved_user.username)
+    all_index = ['auth_req_id', 'decision']
+    for index in all_index:
+        if index not in request.POST or len(request.POST[index]) == 0:
+            return JsonResponse({"error": "invalid parameters"})
+    auth_req_id = request.POST['auth_req_id']
+    decision = request.POST['decision']
+    if decision not in ['apply', 'reject']:
+        return JsonResponse({"error": "no such decision:"+decision})
+    if not AuthorityRequest.objects.filter(id=auth_req_id).exists():
+        return JsonResponse({"error": "no such auth_request"})
+    auth_req = User.objects.get(id=auth_req_id)
+    auth_req.status = decision
+    auth_req.save()
+
+    return JsonResponse({'message': 'ok'})
+
+
+def add_auth_request(request):
+    if request.method != 'POST':
+        return JsonResponse({"error": "require POST"})
+
+    if not check_login(request):
+        return JsonResponse({"error": "please login"})
+    saved_user = User.objects.get(rand_str=request.COOKIES['session_id'])
+    if saved_user.authority != 'user':
+        return JsonResponse({"error": "not a normal user"})
+    print("user requesting auth: ", saved_user.username)
+    all_index = ['lab_info', 'detail']
+    for index in all_index:
+        if index not in request.POST or len(request.POST[index]) == 0:
+            return JsonResponse({"error": "invalid parameters"})
+    auth_req = AuthorityRequest()
+    auth_req.user_id = saved_user.id
+    auth_req.username = saved_user.username
+    auth_req.lab_info = request.POST['lab_info']
+    auth_req.detail = request.POST['detail']
+    auth_req.status = 'pending'
+    auth_req.save()
 
     return JsonResponse({'message': 'ok'})
 

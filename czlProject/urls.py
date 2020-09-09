@@ -15,17 +15,26 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from RegisterApp import views
+
 from django.conf.urls import url
 import EquipmentApp.views
+import RegisterApp.views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url(r'^helloworld$', views.hello_world),
-    url(r'^api/logon$', views.logon),
-    url(r'^api/active/(.+)$', views.active),
-    url(r'^api/login$', views.login),
-    url(r'^api/logout$', views.logout),
+    
+    url(r'^helloworld$', RegisterApp.views.hello_world),
+    url(r'^api/logon$', RegisterApp.views.logon),
+    url(r'^api/active/(.+)$', RegisterApp.views.active),
+    url(r'^api/login$', RegisterApp.views.login),
+    url(r'^api/logout$', RegisterApp.views.logout),
+    url(r'^api/user/query-all$', RegisterApp.views.query_all),
+    url(r'^api/user/set-authority$', RegisterApp.views.set_authority),
+    url(r'^api/user/delete$', RegisterApp.views.delete_user),
+    url(r'^api/user/info$', RegisterApp.views.user_info),
+    url(r'^api/user/auth/decide$', RegisterApp.views.decide_auth_request),
+    url(r'^api/user/auth/add$', RegisterApp.views.add_auth_request),
+    
     url(r'^api/equip/query$', EquipmentApp.views.equip_query),
     url(r'^api/equip/set$', EquipmentApp.views.equip_set),
     url(r'^api/equip/delete$', EquipmentApp.views.equip_delete),
