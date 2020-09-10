@@ -430,6 +430,7 @@ filter是虚的，拆开的话不留filter
     	'total':
     	'auth_req': [
     		{
+    			'auth_req_id':
     			'user_id':
     			'username': ''
     			'lab_info': ''
@@ -437,8 +438,8 @@ filter是虚的，拆开的话不留filter
     			'email':
     			'contact':
     			'status': ''
-    		}
-	]
+			}
+    ]
     }
     
     ```
