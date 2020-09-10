@@ -213,7 +213,7 @@ filter是虚的，拆开的话不留filter
    		'start_time': ''
    		'return_time': ''
    		'detail': ''
-   		'status': 'returned' / 'unreturned'
+   		'status': 'apply' / 'reject' / 'pending'
    	]
    	'error': ''
    }
