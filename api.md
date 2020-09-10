@@ -82,7 +82,9 @@ filter是虚的，拆开的话不留filter
    		'status': 'onsale' / 'rented' / 'unavailable'
            'lessor_name': '', //按照姓名筛选
    		'lessor_id': ,  //按照出租者id进行筛选，非学号
-   		'name_search': //按照设备名进行筛选（搜索）
+   		'name_search': //按照设备名进行筛选（搜索）,
+   		'username':
+   		'user_id':
    	}
    	'page':
    	'page_size':
@@ -194,7 +196,7 @@ filter是虚的，拆开的话不留filter
    		'lessor_name': ''
    		'lessor_id':
    		'renter_name': ''
-   		'renter_id':
+   		'user_id':
    		'equip_name': ''
    		'equip_id':
    	}

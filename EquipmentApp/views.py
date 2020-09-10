@@ -58,6 +58,7 @@ def equip_query(request):
             'lessor_id': 'int',
             'name_search': 'str',
             'username': 'str',
+            'user_id': 'int',
         }
         try:
             my_filter = get_filter(request, filter_eles)
@@ -180,7 +181,6 @@ def equip_request_query(request):
             'equip_name': 'str',
             'equip_id': 'int',
             'end_time': 'str',
-            'username': 'str'
         }
         try:
             my_filter = get_filter(request, filter_eles)
