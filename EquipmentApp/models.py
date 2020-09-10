@@ -8,7 +8,7 @@ class Equipment(models.Model):
     lessor_name = models.CharField(max_length=20)
     username = models.CharField(max_length=20)
     address = models.CharField(max_length=200)
-    end_time = models.TimeField()
+    end_time = models.DateField()
     contact = models.CharField(max_length=200)
     status = models.CharField(max_length=200)
 
@@ -16,6 +16,6 @@ class Equipment(models.Model):
 class SaleRequest(models.Model):
     equip_id = models.IntegerField()
     equip_name = models.CharField(max_length=50)
-    end_time = models.TimeField()
+    end_time = models.DateField()
     lessor_name = models.CharField(max_length=20)
     status = models.CharField(max_length=10)

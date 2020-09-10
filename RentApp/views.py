@@ -122,6 +122,7 @@ def rent_request_query(request):
                 'detail': item.detail,
                 'status': item.status,
             })
+        return JsonResponse({"total": total,"rent_req": rent_req})
     return JsonResponse({"error": "wrong request method"})
 
 def rent_request_decide(request):

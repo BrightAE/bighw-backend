@@ -10,8 +10,8 @@ class RentRequest(models.Model):
     equip_id = models.IntegerField()
     status = models.CharField(max_length=20)
     detail = models.CharField(max_length=200)
-    start_time = models.TimeField()
-    return_time = models.TimeField()
+    start_time = models.DateField()
+    return_time = models.DateField()
 
 
 class RentInformation(models.Model):
@@ -19,7 +19,7 @@ class RentInformation(models.Model):
     equip_name = models.CharField(max_length=50)
     lessor_name = models.CharField(max_length=20)
     username = models.CharField(max_length=20)
-    rent_time = models.TimeField()
-    return_time = models.TimeField()
-    end_time = models.TimeField()
+    rent_time = models.DateField()
+    return_time = models.DateField()
+    end_time = models.DateField()
     status = models.CharField(max_length=20)
