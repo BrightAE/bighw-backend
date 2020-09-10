@@ -161,6 +161,8 @@ def equip_request_query(request):
         filter_eles = {
             'lessor_name': 'str',
             'equip_name': 'str',
+            'equip_id': 'int',
+            'end_time': 'str'
         }
         try:
             my_filter = get_filter(request, filter_eles)

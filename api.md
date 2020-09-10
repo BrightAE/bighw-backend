@@ -226,11 +226,13 @@ filter是虚的，拆开的话不留filter
    url: api/equip/request/query
    Request:
    {
-   	'equip_id':
-   	'end_time': ''
+   	'page':
+   	'page_size': 
    	'filter': { //可选传 自行拆开+2
    		'lessor_name': ''
    		'equip_name': ''
+   		'equip_id':
+   		'end_time': ''
    	}
    }
    Response:
@@ -240,12 +242,15 @@ filter是虚的，拆开的话不留filter
    		'equip_id':
    		'equip_name': ''
    		'end_time': ''
-   	]
+   		'lab_info': ''
+   		'lessor_name':''
+   		'status': ''
+	]
    	'error': ''
    }
    ```
    
-
+   
    
 10. 管理员审核上架申请：
 
