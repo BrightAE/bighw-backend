@@ -125,10 +125,13 @@ def login(request):
 def logout(request):
     if request.method != 'POST':
         return JsonResponse({"error": "require POST"})
+    print("try to logout")
+    print(request.META)
+    print(request.META['HTTP_JWT'])
     if not check_login(request):
         return JsonResponse({"error": "please login"})
     # print(request)
-    # print(request.META['HTTP_JWT'])
+    print(request.META['HTTP_JWT'])
     # return JsonResponse({'error': 'TEST'})
     saved_user = User.objects.get(rand_str=request.META['HTTP_JWT'])
     print("success logout: ", saved_user.username)
@@ -179,7 +182,7 @@ def set_authority(request):
     saved_user = User.objects.get(rand_str=request.META['HTTP_JWT'])
     if saved_user.authority != 'admin':
         return JsonResponse({"error": "not admin"})
-    print("admin setting authority: ", saved_user.username)
+
     all_index = ['user_id', 'authority']
     for index in all_index:
         if index not in request.POST or len(request.POST[index]) == 0:
