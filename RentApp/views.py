@@ -9,7 +9,8 @@ import json
 
 def judge_cookie(request):
     try:
-        saved_user = User.objects.filter(rand_str=request.COOKIES['session_id'])
+        # saved_user = User.objects.filter(rand_str=request.COOKIES['session_id'])
+        saved_user = User.objects.filter(rand_str=request.headers.get('jwt'))
         if not saved_user.exists():
             return False
         return True
@@ -19,7 +20,8 @@ def judge_cookie(request):
 
 def judge_manager(request):
     try:
-        saved_user = User.objects.get(rand_str=request.COOKIES['session_id'])
+        # saved_user = User.objects.get(rand_str=request.COOKIES['session_id'])
+        saved_user = User.objects.get(rand_str=request.headers.get('jwt'))
         if not saved_user.authority == 'admin':
             return False
         return True
@@ -49,8 +51,6 @@ def rent_query(request):
     if request.method == 'GET':
         if judge_cookie(request) is False:
             return JsonResponse({"error": "please login"})
-        session_id = request.COOKIES['session_id']
-        user = User.objects.get(rand_str=session_id)
         filter_eles = {
             'equip_id': 'int',
             'equip_name': 'str',
@@ -90,8 +90,6 @@ def rent_request_query(request):
     if request.method == 'GET':
         if judge_cookie(request) is False:
             return JsonResponse({"error": "please login"})
-        session_id = request.COOKIES['session_id']
-        user = User.objects.get(rand_str=session_id)
         filter_eles = {
             'equip_id': 'int',
             'equip_name': 'str',
@@ -191,7 +189,8 @@ def rent_request_add(request):
             return JsonResponse({"error": "no such a equipment"})
         if equip.status != 'onsale':
             return JsonResponse({"error": "this equipment is not available"})
-        user = User.objects.get(rand_str=request.COOKIES['session_id'])
+        # user = User.objects.get(rand_str=request.COOKIES['session_id'])
+        user = User.objects.get(rand_str=request.headers.get('jwt'))
         rent_req = RentRequest(
             username=user.username,
             lessor_name=equip.lessor_name,
