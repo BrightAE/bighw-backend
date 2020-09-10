@@ -122,7 +122,7 @@ def rent_request_query(request):
                 'detail': item.detail,
                 'status': item.status,
             })
-        return JsonResponse({"total": total,"rent_req": rent_req})
+        return JsonResponse({"total": total, "rent_req": rent_req})
     return JsonResponse({"error": "wrong request method"})
 
 def rent_request_decide(request):
@@ -151,19 +151,21 @@ def rent_request_decide(request):
         elif decision == 'apply':
             rent_req.status = 'apply'
             equip.status = 'rented'
+            equip.username = rent_req.username
             rent_info = RentInformation(
                 equip_id=rent_req.equip_id,
                 equip_name=rent_req.equip_name,
                 lessor_name=rent_req.lessor_name,
                 username=rent_req.username,
                 rent_time=rent_req.start_time,
-                return_time=None,
+                return_time=rent_req.return_time,
                 end_time=equip.end_time,
                 status='unreturned'
             )
             rent_req.save()
             equip.save()
             rent_info.save()
+            return JsonResponse({"message": "ok"})
         else:
             return JsonResponse({"error": "invalid decision"})
     return JsonResponse({"error": "wrong request method"})
@@ -211,7 +213,7 @@ def rent_confirm(request):
         if judge_cookie(request) is False:
             return JsonResponse({"error": "please login"})
         if 'rent_info_id' in request.POST:
-            rent_info_id = request.POST
+            rent_info_id = request.POST['rent_info_id']
         else:
             return JsonResponse({"error": "invalid parameters"})
         try:
@@ -223,4 +225,5 @@ def rent_confirm(request):
         equip.status = 'onsale'
         rent_info.save()
         equip.save()
+        return JsonResponse({"message": "ok"})
     return JsonResponse({"error": "wrong request method"})

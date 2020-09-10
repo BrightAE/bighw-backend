@@ -265,7 +265,7 @@ def equip_request_add(request):
             return JsonResponse({"error": "this is not your equipment"})
         sale_req = SaleRequest()
         sale_req.equip_id = equip_id
-        sale_req.end = end_time
+        sale_req.end_time = end_time
         sale_req.equip_name = equip.equip_name
         sale_req.lessor_name = equip.lessor_name
         sale_req.status = 'pending'
