@@ -245,13 +245,11 @@ filter是虚的，拆开的话不留filter
    		'end_time': ''
    		'lab_info': ''
    		'lessor_name':''
-		'status': ''
+			'status': 'apply' / 'reject' / 'pending'
    	]
    	'error': ''
    }
    ```
-   
-   
    
 10. 管理员审核上架申请：
 
@@ -410,6 +408,36 @@ filter是虚的，拆开的话不留filter
     	'error': ''
     }
     ```
+    
+19. 管理员查看普通用户变成设备提供者的申请
+
+    ```
+    Method: GET
+    url: api/user/auth/query
+    QueryParam:
+    {
+    	page:
+    	page_size:
+    }
+    Response:
+    {
+    	'total':
+    	'auth_req': [
+    		{
+    			'user_id':
+    			'user_name': ''
+    			'status': ''
+    			'lab_info': ''
+    			'detail': ''
+    			'email':
+    			'contact':
+    		}
+    	]
+    }
+    
+    ```
+
+    
 
 ### 2. 普通用户
 
