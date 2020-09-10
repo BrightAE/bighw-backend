@@ -114,12 +114,10 @@ filter是虚的，拆开的话不留filter
    Request:
    {
    	'equip_id': 
-   	'set_info': {   //均是可选传
-           'equip_name': ''
-           'address': ''
-           'end_time': ''
-           'status': '' 
-   	}
+       'equip_name': ''
+       'address': ''
+       'end_time': ''
+       'status': '' 
    }
    Response:
    {
@@ -128,7 +126,7 @@ filter是虚的，拆开的话不留filter
    }
    
    ```
-
+   
 6. 删除设备：
 
    ```

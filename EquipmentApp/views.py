@@ -104,7 +104,19 @@ def equip_set(request):
         except Exception:
             return JsonResponse({"error": "this is not your equipment"})
         try:
-            set_info = request.POST.get('set_info')
+            set_info = {}
+            info_name = {
+                'equip_id': 'int',
+                'equip_name': 'str',
+                'address': 'str',
+                'end_time': 'str',
+                'status': 'str'
+            }
+            for item in info_name:
+                if item in request.POST:
+                    set_info[item] = request.POST.get(item)
+            if len(set_info) == 0:
+                raise RuntimeError
         except Exception:
             return JsonResponse({"error": "no avaliable change"})
         for item in set_info:
@@ -126,7 +138,7 @@ def equip_delete(request):
             equip = Equipment.objects.get(id=equip_id)
             # user = User.objects.get(rand_str=request.COOKIES['session_id'])
             user = User.objects.get(rand_str=request.headers['jwt'])
-            if user.username != equip.lessor_name:
+            if user.username != equip.lessor_name and user.authority != 'admin':
                 raise RuntimeError
         except Exception:
             return JsonResponse({"error": "this is not your equipment"})
