@@ -118,6 +118,8 @@ def equip_set(request):
                 raise RuntimeError
         except Exception:
             return JsonResponse({"error": "no avaliable change"})
+        if user.authority != 'admin' and equip.status == 'rented':
+            return JsonResponse({"error": "this is equipment is not returned"})
         for item in set_info:
             equip.__setattr__(item, set_info[item])
         equip.save()
