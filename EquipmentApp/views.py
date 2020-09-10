@@ -57,13 +57,13 @@ def equip_query(request):
             'lessor_name': 'str',
             'lessor_id': 'int',
             'name_search': 'str',
+            'username': 'str',
+            'user_id': 'int',
         }
         try:
             my_filter = get_filter(request, filter_eles)
         except Exception:
             return JsonResponse({"error": "invalid filter parameters"})
-        if judge_manager(request) is False:
-            my_filter['lessor_name'] = lessor.username
         results = Equipment.objects.filter(**my_filter)
         total = len(results)
         page = parse_int(request.GET.get('page'), 1)
@@ -164,7 +164,7 @@ def equip_add(request):
         equip.contact = user.contact
         equip.status = 'unavailable'
         equip.end_time = '1970-01-01'
-        equip.username = '-1'
+        equip.username = 'none'
         equip.save()
         return JsonResponse({"message": "ok"})
     return JsonResponse({"error": "wrong request method"})
@@ -180,14 +180,12 @@ def equip_request_query(request):
             'lessor_name': 'str',
             'equip_name': 'str',
             'equip_id': 'int',
-            'end_time': 'str'
+            'end_time': 'str',
         }
         try:
             my_filter = get_filter(request, filter_eles)
         except Exception:
             return JsonResponse({"error": "invaild filter parameters"})
-        if judge_manager(request) is False:
-            my_filter['lessor_name'] = lessor.username
         results = SaleRequest.objects.filter(**my_filter)
         total = len(results)
         page = parse_int(request.GET.get('page'), 1)

@@ -20,3 +20,4 @@ class AuthorityRequest(models.Model):
     username = models.CharField(max_length=20)
     lab_info = models.CharField(max_length=200)
     detail = models.CharField(max_length=200)
+    status = models.CharField(max_length=20, default='pending')

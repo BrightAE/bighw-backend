@@ -82,7 +82,9 @@ filter是虚的，拆开的话不留filter
    		'status': 'onsale' / 'rented' / 'unavailable'
            'lessor_name': '', //按照姓名筛选
    		'lessor_id': ,  //按照出租者id进行筛选，非学号
-   		'name_search': //按照设备名进行筛选（搜索）
+   		'name_search': //按照设备名进行筛选（搜索）,
+   		'username':
+   		'user_id':
    	}
    	'page':
    	'page_size':
@@ -194,7 +196,7 @@ filter是虚的，拆开的话不留filter
    		'lessor_name': ''
    		'lessor_id':
    		'renter_name': ''
-   		'renter_id':
+   		'user_id':
    		'equip_name': ''
    		'equip_id':
    	}
@@ -245,13 +247,11 @@ filter是虚的，拆开的话不留filter
    		'end_time': ''
    		'lab_info': ''
    		'lessor_name':''
-		'status': ''
+			'status': 'apply' / 'reject' / 'pending'
    	]
    	'error': ''
    }
    ```
-   
-   
    
 10. 管理员审核上架申请：
 
@@ -410,6 +410,40 @@ filter是虚的，拆开的话不留filter
     	'error': ''
     }
     ```
+    
+19. 查看普通用户变成设备提供者的申请
+
+    ```
+    Method: GET
+    url: api/user/auth/query
+    QueryParam:
+    {
+    	'filter': { //可选传 自行拆开
+    		'user_id':    	// 从1开始的那个用户id。不传此项表示查询所有的
+    	}
+    	'status': 		// 为'all' 或者 'pending',pending表示只查未审批的
+    	'page':
+    	'page_size':
+    }
+    Response:
+    {
+    	'total':
+    	'auth_req': [
+    		{
+    			'user_id':
+    			'username': ''
+    			'lab_info': ''
+    			'detail': ''
+    			'email':
+    			'contact':
+    			'status': ''
+    		}
+	]
+    }
+    
+    ```
+    
+    
 
 ### 2. 普通用户
 
