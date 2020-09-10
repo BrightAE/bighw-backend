@@ -8,7 +8,8 @@ from .models import Equipment, SaleRequest
 
 def judge_cookie(request):
     try:
-        saved_user = User.objects.filter(rand_str=request.COOKIES['session_id'])
+        # saved_user = User.objects.filter(rand_str=request.COOKIES['session_id'])
+        saved_user = User.objects.filter(rand_str=request.headers.get('jwt'))
         if not saved_user.exists():
             return False
         return True
@@ -18,7 +19,8 @@ def judge_cookie(request):
 
 def judge_manager(request):
     try:
-        saved_user = User.objects.get(rand_str=request.COOKIES['session_id'])
+        # saved_user = User.objects.get(rand_str=request.COOKIES['session_id'])
+        saved_user = User.objects.get(rand_str=request.headers.get('jwt'))
         if not saved_user.authority == 'admin':
             return True
     except Exception:
@@ -47,7 +49,8 @@ def equip_query(request):
     if request.method == 'GET':
         if judge_cookie(request) is False:
             return JsonResponse({"error": "please login"})
-        session_id = request.COOKIES['session_id']
+        # session_id = request.COOKIES['session_id']
+        session_id = request.headers.get('jwt')
         lessor = User.objects.get(rand_str=session_id)
         filter_eles = {
             'status': 'str',
@@ -94,7 +97,8 @@ def equip_set(request):
             return JsonResponse({"error": "no such a equipment"})
         try:
             equip = Equipment.objects.get(id=equip_id)
-            user = User.objects.get(rand_str=request.COOKIES['session_id'])
+            # user = User.objects.get(rand_str=request.COOKIES['session_id'])
+            user = User.objects.get(rand_str=request.headers.get('jwt'))
             if user.username != equip.lessor_name:
                 raise RuntimeError
         except Exception:
@@ -120,7 +124,8 @@ def equip_delete(request):
             return JsonResponse({"error": "no such a equipment"})
         try:
             equip = Equipment.objects.get(id=equip_id)
-            user = User.objects.get(rand_str=request.COOKIES['session_id'])
+            # user = User.objects.get(rand_str=request.COOKIES['session_id'])
+            user = User.objects.get(rand_str=request.headers['jwt'])
             if user.username != equip.lessor_name:
                 raise RuntimeError
         except Exception:
@@ -139,7 +144,8 @@ def equip_add(request):
             address = request.POST.get('address')
         except Exception:
             return JsonResponse({"error": "invalid parameters"})
-        user = User.objects.get(rand_str=request.COOKIES['session_id'])
+        # user = User.objects.get(rand_str=request.COOKIES['session_id'])
+        user = User.objects.get(rand_str=request.headers.get('jwt'))
         equip = Equipment()
         equip.equip_name = equip_name
         equip.lessor_name = user.username
@@ -157,7 +163,8 @@ def equip_request_query(request):
     if request.method == 'GET':
         if judge_cookie(request) is False:
             return JsonResponse({"error": "please login"})
-        lessor = User.objects.get(rand_str=request.COOKIES['session_id'])
+        # lessor = User.objects.get(rand_str=request.COOKIES['session_id'])
+        lessor = User.objects.get(rand_str=request.headers.get('jwt'))
         filter_eles = {
             'lessor_name': 'str',
             'equip_name': 'str',
@@ -239,7 +246,8 @@ def equip_request_add(request):
             equip = Equipment.objects.get(id=equip_id)
         except Exception:
             return JsonResponse({"error": "no such a equipment"})
-        user = User.objects.get(rand_str=request.COOKIES['session_id'])
+        # user = User.objects.get(rand_str=request.COOKIES['session_id'])
+        user = User.objects.get(rand_str=request.headers.get('jwt'))
         if user.username != equip.lessor_name:
             return JsonResponse({"error": "this is not your equipment"})
         sale_req = SaleRequest()
