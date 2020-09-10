@@ -35,6 +35,7 @@ urlpatterns = [
     url(r'^api/user/info$', RegisterApp.views.user_info),
     url(r'^api/user/auth/decide$', RegisterApp.views.decide_auth_request),
     url(r'^api/user/auth/add$', RegisterApp.views.add_auth_request),
+    url(r'^api/user/auth/query$', RegisterApp.views.query_auth_request),
     
     url(r'^api/equip/query$', EquipmentApp.views.equip_query),
     url(r'^api/equip/set$', EquipmentApp.views.equip_set),
