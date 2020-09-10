@@ -259,7 +259,9 @@ def decide_auth_request(request):
 
     if decision == 'apply':
         req_user = User.objects.get(id=auth_req.user_id)
+        req_user.authority = 'lessor'
         req_user.lab_info = auth_req.lab_info
+        req_user.save()
 
     return JsonResponse({'message': 'ok'})
 
@@ -331,7 +333,8 @@ def query_auth_request(request):
     while i < right:
         item = result_list[i]
         temp_user = User.objects.get(id=item.user_id)
-        return_list.append({'user_id': item.user_id, 'username': item.username, 'lab_info': item.lab_info,
+        return_list.append({'auth_req_id': item.id, 'user_id': item.user_id,
+                            'username': item.username, 'lab_info': item.lab_info, 'detail': item.detail,
                             'email': temp_user.email, 'contact': temp_user.contact, 'status': item.status})
         i += 1
 
