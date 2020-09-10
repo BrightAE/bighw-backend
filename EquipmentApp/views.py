@@ -181,7 +181,8 @@ def equip_request_query(request):
         for item in results:
             lessor = User.objects.get(username=item.lessor_name)
             equip_req.append({
-                "equip_id": item.id,
+                "sale_req_id": item.id,
+                "equip_id": item.equip_id,
                 "equip_name": item.equip_name,
                 "end_time": item.end_time,
                 "lessor_name": item.lessor_name,

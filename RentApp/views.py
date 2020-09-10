@@ -73,6 +73,7 @@ def rent_query(request):
         rent_info = []
         for item in results:
             rent_info.append({
+                'rent_id': item.id,
                 'equip_id': item.equip_id,
                 'equip_name': item.equip_name,
                 'lessor_name': item.lessor_name,
@@ -113,6 +114,7 @@ def rent_request_query(request):
         rent_req = []
         for item in results:
             rent_req.append({
+                'rent_req_id': item.id,
                 'equip_id': item.equip_id,
                 'equip_name': item.equip_name,
                 'lessor_name': item.lessor_name,

@@ -168,6 +168,7 @@ filter是虚的，拆开的话不留filter
    	'total':
    	'rent_info': [
    		{
+   			'rent_id':
    			'equip_id':
    			'equip_name': ''
    			'lessor_name': ''
@@ -206,6 +207,7 @@ filter是虚的，拆开的话不留filter
    {
    	'total':
    	'rent_requests': [
+   		'rent_req_id':
    		'equip_id':
    		'equip_name': ''
    		'lessor_name': ''
@@ -239,13 +241,14 @@ filter是虚的，拆开的话不留filter
    {
    	'total':
    	'equip_req': [
+   		'sale_req_id':
    		'equip_id':
    		'equip_name': ''
    		'end_time': ''
    		'lab_info': ''
    		'lessor_name':''
-   		'status': ''
-	]
+		'status': ''
+   	]
    	'error': ''
    }
    ```
