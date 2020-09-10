@@ -130,7 +130,7 @@ def rent_request_decide(request):
         if judge_cookie(request) is False:
             return JsonResponse({"error": "please login"})
         if 'rent_req_id' in request.POST:
-            rent_req_id = request.POST
+            rent_req_id = request.POST.get('rent_req_id')
         else:
             return JsonResponse({"error": "no such a rent request"})
         if 'decision' in request.POST:
