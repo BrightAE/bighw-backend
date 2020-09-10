@@ -253,9 +253,13 @@ def decide_auth_request(request):
         return JsonResponse({"error": "no such decision:"+decision})
     if not AuthorityRequest.objects.filter(id=auth_req_id).exists():
         return JsonResponse({"error": "no such auth_request"})
-    auth_req = User.objects.get(id=auth_req_id)
+    auth_req = AuthorityRequest.objects.get(id=auth_req_id)
     auth_req.status = decision
     auth_req.save()
+
+    if decision == 'apply':
+        req_user = User.objects.get(id=auth_req.user_id)
+        req_user.lab_info = auth_req.lab_info
 
     return JsonResponse({'message': 'ok'})
 
@@ -285,8 +289,59 @@ def add_auth_request(request):
     return JsonResponse({'message': 'ok'})
 
 
+def query_auth_request(request):
+    if request.method != 'GET':
+        return JsonResponse({"error": "require GET"})
+
+    if not check_login(request):
+        return JsonResponse({"error": "please login"})
+    saved_user = User.objects.get(rand_str=request.META['HTTP_JWT'])
+    # if saved_user.authority != 'admin':
+    #     return JsonResponse({"error": "not admin"})
+    print("user querying auth_request: ", saved_user.username)
+
+    all_index = ['page', 'page_size', 'status']
+    for index in all_index:
+        if index not in request.GET or len(request.GET[index]) == 0:
+            return JsonResponse({"error": "invalid parameters"})
+    if request.GET['status'] not in ['all', 'pending']:
+        return JsonResponse({"error": "invalid parameters"})
+    page_id = int(request.GET['page'])
+    page_size = int(request.GET['page_size'])
+
+    if 'user_id' in request.GET:
+        user_id = int(request.GET['user_id'])
+        if saved_user.authority != 'admin' and saved_user.id != user_id:
+            return JsonResponse({"error": "not admin"})
+        if request.GET['status'] == 'all':
+            result_list = AuthorityRequest.objects.filter(user_id=user_id)
+        else:
+            result_list = AuthorityRequest.objects.filter(user_id=user_id, status='pending')
+    else:
+        if saved_user.authority != 'admin':
+            return JsonResponse({"error": "not admin"})
+        if request.GET['status'] == 'all':
+            result_list = AuthorityRequest.objects.all()
+        else:
+            result_list = AuthorityRequest.objects.filter(status='pending')
+    left = min(len(result_list), (page_id-1)*page_size)
+    right = min(len(result_list), page_id*page_size)
+    return_list = []
+    i = left
+    while i < right:
+        item = result_list[i]
+        temp_user = User.objects.get(id=item.user_id)
+        return_list.append({'user_id': item.user_id, 'username': item.username, 'lab_info': item.lab_info,
+                            'email': temp_user.email, 'contact': temp_user.contact, 'status': item.status})
+        i += 1
+
+    # return JsonResponse(json.dumps(return_list, separators=(',', ':'), indent=4))
+    return JsonResponse({'total': len(result_list), 'auth_req': return_list})
+
 # def check_login(request):
 #     return 'session_id' in request.COOKIES and len(request.COOKIES['session_id']) > 0\
 #            and User.objects.filter(rand_str=request.COOKIES['session_id']).exists()
+
+
 def check_login(request):
     return 'HTTP_JWT' in request.META and User.objects.filter(rand_str=request.META['HTTP_JWT']).exists()
