@@ -66,7 +66,7 @@ def equip_query(request):
         page = parse_int(request.GET.get('page'), 1)
         page_size = parse_int(request.GET.get('page_size'), 20)
         my_filter['id__gte'] = (page - 1) * page_size
-        my_filter['id__lt'] = page * page_size
+        my_filter['id__lt'] = page * page_size + 1
         results = Equipment.objects.filter(**my_filter)
         equip = []
         for item in results:
@@ -146,6 +146,8 @@ def equip_add(request):
         equip.address = address
         equip.contact = user.contact
         equip.status = 'unavailable'
+        equip.end_time = '00:00'
+        equip.username = '-1'
         equip.save()
         return JsonResponse({"message": "ok"})
     return JsonResponse({"error": "wrong request method"})
@@ -171,7 +173,7 @@ def equip_request_query(request):
         page = parse_int(request.GET.get('page'), 1)
         page_size = parse_int(request.GET.get('page_size'), 20)
         my_filter['id__gte'] = (page - 1) * page_size
-        my_filter['id__lt'] = page * page_size
+        my_filter['id__lt'] = page * page_size + 1
         results = SaleRequest.objects.filter(**my_filter)
         equip_req = []
         for item in results:
