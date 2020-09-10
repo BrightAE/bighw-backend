@@ -110,8 +110,8 @@ def login(request):
     if login_password != saved_user.password:
         return JsonResponse({"error": "password is wrong"})
 
-    if len(saved_user.rand_str) > 0:
-        return JsonResponse({'error': 'has logged in'})
+    # if len(saved_user.rand_str) > 0:
+    #     return JsonResponse({'error': 'has logged in'})
 
     rand_str = get_rand_str(88)
     saved_user.rand_str = rand_str
