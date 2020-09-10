@@ -175,10 +175,14 @@ def equip_request_query(request):
         results = SaleRequest.objects.filter(**my_filter)
         equip_req = []
         for item in results:
+            lessor = User.objects.get(username=item.lessor_name)
             equip_req.append({
                 "equip_id": item.id,
                 "equip_name": item.equip_name,
-                "end_time": item.end_time
+                "end_time": item.end_time,
+                "lessor_name": item.lessor_name,
+                "status": item.status,
+                "lab_info": lessor.lab_info
             })
         return JsonResponse({"total": total, "equip_req": equip_req})
     return JsonResponse({"error": "wrong request method"})
