@@ -411,15 +411,19 @@ filter是虚的，拆开的话不留filter
     }
     ```
     
-19. 管理员查看普通用户变成设备提供者的申请
+19. 查看普通用户变成设备提供者的申请
 
     ```
     Method: GET
     url: api/user/auth/query
     QueryParam:
     {
-    	page:
-    	page_size:
+    	'filter': { //可选传 自行拆开
+    		'user_id':    	// 从1开始的那个用户id。不传此项表示查询所有的
+    	}
+    	'status': 		// 为'all' 或者 'pending',pending表示只查未审批的
+    	'page':
+    	'page_size':
     }
     Response:
     {
@@ -427,18 +431,18 @@ filter是虚的，拆开的话不留filter
     	'auth_req': [
     		{
     			'user_id':
-    			'user_name': ''
-    			'status': ''
+    			'username': ''
     			'lab_info': ''
     			'detail': ''
     			'email':
     			'contact':
+    			'status': ''
     		}
-    	]
+	]
     }
     
     ```
-
+    
     
 
 ### 2. 普通用户
