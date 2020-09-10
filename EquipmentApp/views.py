@@ -99,14 +99,13 @@ def equip_set(request):
             equip = Equipment.objects.get(id=equip_id)
             # user = User.objects.get(rand_str=request.COOKIES['session_id'])
             user = User.objects.get(rand_str=request.headers.get('jwt'))
-            if user.username != equip.lessor_name:
+            if user.username != equip.lessor_name and user.authority != 'admin':
                 raise RuntimeError
         except Exception:
             return JsonResponse({"error": "this is not your equipment"})
         try:
             set_info = {}
             info_name = {
-                'equip_id': 'int',
                 'equip_name': 'str',
                 'address': 'str',
                 'end_time': 'str',
@@ -120,7 +119,7 @@ def equip_set(request):
         except Exception:
             return JsonResponse({"error": "no avaliable change"})
         for item in set_info:
-            equip[item] = set_info[item]
+            equip.__setattr__(item, set_info[item])
         equip.save()
         return JsonResponse({"message": "ok"})
     return JsonResponse({"error": "wrong request method"})
@@ -164,7 +163,7 @@ def equip_add(request):
         equip.address = address
         equip.contact = user.contact
         equip.status = 'unavailable'
-        equip.end_time = '00:00'
+        equip.end_time = '1970-01-01'
         equip.username = '-1'
         equip.save()
         return JsonResponse({"message": "ok"})
@@ -216,6 +215,8 @@ def equip_request_decide(request):
     if request.method == 'POST':
         if judge_cookie(request) is False:
             return JsonResponse({"error": "please login"})
+        if judge_manager(request) is False:
+            return JsonResponse({"error": "you are not administrator"})
         try:
             sale_req_id = request.POST.get('sale_req_id')
         except Exception:
