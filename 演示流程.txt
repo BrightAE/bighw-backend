@@ -1,0 +1,15 @@
+chrome,firefox,edge仨浏览器
+开始：chrome登着一个admin账号,正在显示所有用户(一个admin一个user)。firefox登着一个普通账号，edge留在注册页面
+
+firefox的申请成为lessor，chrome批准并刷新(变成一个admin一个lessor)；
+firefox刷新、增加两个设备，都申请上架
+admin同意所有申请、刷新，然后查看所有上架机器。
+
+edge注册并登录一个账号。
+去admin那边查看所有用户（一个admin一个lessor一个user）
+回edge的普通用户，申请租借一台机器。
+去firefox的lessor同意租借申请，并查看自己设备状态(多了一台使用中)
+去chrome的admin查看所有租借申请（发现那个申请已同意），查看所有机器(使用中)
+回edge的普通用户，看自己的申请（已同意），再看自己的租借历史(多了一个使用中)
+
+lessor确认归还。去所有机器列表刷新看看。
