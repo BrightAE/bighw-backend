@@ -332,6 +332,7 @@ def query_auth_request(request):
     i = left
     while i < right:
         item = result_list[i]
+        # print("TRY!!! ", item.user_id)
         temp_user = User.objects.get(id=item.user_id)
         return_list.append({'auth_req_id': item.id, 'user_id': item.user_id,
                             'username': item.username, 'lab_info': item.lab_info, 'detail': item.detail,
