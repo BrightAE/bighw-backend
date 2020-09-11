@@ -77,7 +77,9 @@ def rent_query(request):
                 'equip_id': item.equip_id,
                 'equip_name': item.equip_name,
                 'lessor_name': item.lessor_name,
+                'lessor_id': item.lessor_id,
                 'username': item.username,
+                'user_id': item.user_id,
                 'rent_time': item.rent_time,
                 'return_time': item.return_time,
                 'end_time': item.end_time,
@@ -116,7 +118,9 @@ def rent_request_query(request):
                 'equip_id': item.equip_id,
                 'equip_name': item.equip_name,
                 'lessor_name': item.lessor_name,
+                'lessor_id': item.lessor_id,
                 'username': item.username,
+                'user_id': item.user_id,
                 'start_time': item.start_time,
                 'return_time': item.return_time,
                 'detail': item.detail,
@@ -152,11 +156,14 @@ def rent_request_decide(request):
             rent_req.status = 'apply'
             equip.status = 'rented'
             equip.username = rent_req.username
+            equip.user_id = rent_req.user_id
             rent_info = RentInformation(
                 equip_id=rent_req.equip_id,
                 equip_name=rent_req.equip_name,
                 lessor_name=rent_req.lessor_name,
+                lessor_id=rent_req.lessor_id,
                 username=rent_req.username,
+                user_id=rent_req.user_id,
                 rent_time=rent_req.start_time,
                 return_time=rent_req.return_time,
                 end_time=equip.end_time,
@@ -196,7 +203,9 @@ def rent_request_add(request):
         user = User.objects.get(rand_str=request.headers.get('jwt'))
         rent_req = RentRequest(
             username=user.username,
+            user_id=user.id,
             lessor_name=equip.lessor_name,
+            lessor_id=equip.lessor_id,
             equip_name=equip.equip_name,
             equip_id=equip_id,
             status='pending',

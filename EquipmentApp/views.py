@@ -77,11 +77,13 @@ def equip_query(request):
                 'equip_id': item.id,
                 'equip_name': item.equip_name,
                 'lessor_name': item.lessor_name,
+                'lessor_id': item.lessor_id,
                 'address': item.address,
                 'end_time': item.end_time,
                 'contact': item.contact,
                 'status': item.status,
-                'username': item.username
+                'username': item.username,
+                'user_id': item.user_id,
             })
         return JsonResponse({'total': total, 'equip': equip})
     return JsonResponse({"error": "wrong request method"})
@@ -99,7 +101,7 @@ def equip_set(request):
             equip = Equipment.objects.get(id=equip_id)
             # user = User.objects.get(rand_str=request.COOKIES['session_id'])
             user = User.objects.get(rand_str=request.headers.get('jwt'))
-            if user.username != equip.lessor_name and user.authority != 'admin':
+            if user.id != equip.lessor_id and user.authority != 'admin':
                 raise RuntimeError
         except Exception:
             return JsonResponse({"error": "this is not your equipment"})
@@ -139,7 +141,7 @@ def equip_delete(request):
             equip = Equipment.objects.get(id=equip_id)
             # user = User.objects.get(rand_str=request.COOKIES['session_id'])
             user = User.objects.get(rand_str=request.headers['jwt'])
-            if user.username != equip.lessor_name and user.authority != 'admin':
+            if user.id != equip.lessor_id and user.authority != 'admin':
                 raise RuntimeError
         except Exception:
             return JsonResponse({"error": "this is not your equipment"})
@@ -162,11 +164,13 @@ def equip_add(request):
         equip = Equipment()
         equip.equip_name = equip_name
         equip.lessor_name = user.username
+        equip.lessor_id = user.id
         equip.address = address
         equip.contact = user.contact
         equip.status = 'unavailable'
         equip.end_time = '1970-01-01'
         equip.username = 'none'
+        equip.user_id = -1
         equip.save()
         return JsonResponse({"message": "ok"})
     return JsonResponse({"error": "wrong request method"})
@@ -180,6 +184,7 @@ def equip_request_query(request):
         lessor = User.objects.get(rand_str=request.headers.get('jwt'))
         filter_eles = {
             'lessor_name': 'str',
+            'lessor_id': 'int',
             'equip_name': 'str',
             'equip_id': 'int',
             'end_time': 'str',
@@ -204,6 +209,7 @@ def equip_request_query(request):
                 "equip_name": item.equip_name,
                 "end_time": item.end_time,
                 "lessor_name": item.lessor_name,
+                "lessor_id": item.lessor_id,
                 "status": item.status,
                 "lab_info": lessor.lab_info
             })
@@ -268,6 +274,7 @@ def equip_request_add(request):
         sale_req.end_time = end_time
         sale_req.equip_name = equip.equip_name
         sale_req.lessor_name = equip.lessor_name
+        sale_req.lessor_id = equip.lessor_id
         sale_req.status = 'pending'
         sale_req.save()
         return JsonResponse({"message": "ok"})
