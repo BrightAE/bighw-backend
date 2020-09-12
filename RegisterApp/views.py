@@ -4,6 +4,8 @@
 from django.http import HttpResponse
 from django.http import JsonResponse
 from UserApp.models import User, AuthorityRequest
+from MessageApp.models import Message
+from MessageApp.add_message import add_message
 # from django.contrib.auth.hashers import make_password, check_password
 import RegisterApp.send_email
 import random
@@ -63,6 +65,14 @@ def logon(request):
     test.rand_str = rand_str
     test.save()
 
+    add_message('all', 0, 0, '用户注册', '新用户(未激活)  用户名:' + test.username + ',学工号:' + str(test.student_id))
+    # new_message = Message()
+    # new_message.type = 'all'
+    # new_message.from_id = new_message.to_id = 0
+    # new_message.title = '用户注册'
+    # new_message.content = '新用户(未激活)  用户名:' + test.username + ',学工号:' + str(test.student_id)
+    # new_message.save()
+
     return JsonResponse({'message': "ok"})
 
 
@@ -77,7 +87,15 @@ def active(request, rand_str):
     saved_user.active = 1
     saved_user.rand_str = ''
     saved_user.save()
-    # print(saved_account.active)
+
+    add_message('all', 0, 0, '用户激活', '激活用户  用户名:' + saved_user.username + ',学工号:' + saved_user.student_id)
+    # new_message = Message()
+    # new_message.type = 'all'
+    # new_message.from_id = new_message.to_id = 0
+    # new_message.title = '用户激活'
+    # new_message.content = '激活用户  用户名:' + saved_user.username + ',学工号:' + saved_user.student_id
+    # new_message.save()
+
     return JsonResponse({"message": "ok"})
 
 
@@ -116,9 +134,16 @@ def login(request):
     rand_str = get_rand_str(88)
     saved_user.rand_str = rand_str
     saved_user.save()
-    # response = JsonResponse({'message': 'ok'})
-    # response.set_cookie('session_id', rand_str)
     response = JsonResponse({'message': 'ok', 'jwt': rand_str})
+
+    add_message('all', 0, 0, '用户登录', '用户登录  用户名:' + saved_user.username + ',学工号:' + saved_user.student_id)
+    # new_message = Message()
+    # new_message.type = 'all'
+    # new_message.from_id = new_message.to_id = 0
+    # new_message.title = '用户登录'
+    # new_message.content = '用户登录  用户名:' + saved_user.username + ',学工号:' + saved_user.student_id
+    # new_message.save()
+
     return response
 
 
@@ -138,6 +163,15 @@ def logout(request):
     response = JsonResponse({'message': 'ok'})
     saved_user.rand_str = ''
     saved_user.save()
+
+    add_message('all', 0, 0, '用户登出', '用户登出  用户名:' + saved_user.username + ',学工号:' + saved_user.student_id)
+    # new_message = Message()
+    # new_message.type = 'all'
+    # new_message.from_id = new_message.to_id = 0
+    # new_message.title = '用户登出'
+    # new_message.content = '用户登出  用户名:' + saved_user.username + ',学工号:' + saved_user.student_id
+    # new_message.save()
+
     return response
 
 
@@ -156,6 +190,7 @@ def query_all(request):
     page_id = int(request.GET['page'])
     page_size = int(request.GET['page_size'])
     result_list = User.objects.all()
+    result_list = result_list.order_by('-id')
     if filt == 'lessor':
         result_list = User.objects.filter(authority='lessor')
     left = min(len(result_list), (page_id-1)*page_size)
@@ -197,6 +232,17 @@ def set_authority(request):
     set_user.authority = authority
     set_user.save()
 
+    add_message('all', 0, 0, '管理员设置用户权限',
+                '用户名:' + set_user.username + ',学工号:' + set_user.student_id + '\n    权限变更为:' + set_user.authority)
+    # new_message = Message()
+    # new_message.type = 'all'
+    # new_message.from_id = new_message.to_id = 0
+    # new_message.title = '管理员设置用户权限'
+    # new_message.content = '用户名:' + set_user.username + ',学工号:' + set_user.student_id \
+    #                       + '\n    权限变更为:' + set_user.authority
+    # new_message.save()
+    # print("set auth   ", new_message.time)
+
     return JsonResponse({'message': 'ok'})
 
 
@@ -216,8 +262,16 @@ def delete_user(request):
     if not User.objects.filter(id=user_id).exists():
         return JsonResponse({"error": "no such user"})
     del_user = User.objects.get(id=user_id)
-    del_user.delete()
 
+    add_message('all', 0, 0, '管理员删除用户', '用户名:' + del_user.username + ',学工号:' + del_user.student_id)
+    # new_message = Message()
+    # new_message.type = 'all'
+    # new_message.from_id = new_message.to_id = 0
+    # new_message.title = '管理员删除用户'
+    # new_message.content = '用户名:' + del_user.username + ',学工号:' + del_user.student_id
+    # new_message.save()
+
+    del_user.delete()
     return JsonResponse({'message': 'ok'})
 
 
@@ -262,6 +316,30 @@ def decide_auth_request(request):
         req_user.authority = 'lessor'
         req_user.lab_info = auth_req.lab_info
         req_user.save()
+
+    req_user = User.objects.get(id=auth_req.user_id)
+    print('admin decide auth_req :  user_id=', req_user.id)
+
+    add_message('user', 0, req_user.id, '权限申请审批结果', '审批结果:' + ('同意' if decision == 'apply' else '拒绝'))
+    # new_message = Message()
+    # new_message.type = 'all'
+    # new_message.from_id = 0
+    # new_message.to_id = req_user.id
+    # new_message.title = '权限申请审批结果'
+    # new_message.content = '审批结果:' + ('同意' if decision == 'apply' else '拒绝')
+    # new_message.save()
+
+    add_message('all', 0, 0, '管理员审批用户权限申请',
+                '用户名:' + req_user.username + ',学工号:' + req_user.student_id + '\n 审批结果:'
+                + ('同意' if decision == 'apply' else '拒绝')
+                )
+    # new_message = Message()
+    # new_message.type = 'all'
+    # new_message.from_id = new_message.to_id = 0
+    # new_message.title = '管理员审批用户权限申请'
+    # new_message.content = '用户名:' + req_user.username + ',学工号:' + req_user.student_id + '\n 审批结果:'\
+    #                       + ('同意' if decision == 'apply' else '拒绝')
+    # new_message.save()
 
     return JsonResponse({'message': 'ok'})
 
@@ -326,6 +404,7 @@ def query_auth_request(request):
             result_list = AuthorityRequest.objects.all()
         else:
             result_list = AuthorityRequest.objects.filter(status='pending')
+    result_list = result_list.order_by('-id')
     left = min(len(result_list), (page_id-1)*page_size)
     right = min(len(result_list), page_id*page_size)
     return_list = []
