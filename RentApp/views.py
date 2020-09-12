@@ -67,8 +67,8 @@ def rent_query(request):
         total = len(results)
         page = parse_int(request.GET.get('page'), 1)
         page_size = parse_int(request.GET.get('page_size'), 20)
-        my_filter['id__gte'] = (page - 1) * page_size
-        my_filter['id__lt'] = page * page_size + 1
+        my_filter['id__gte'] = total - page * page_size + 1
+        my_filter['id__lt'] = total - (page - 1) * page_size + 1
         results = RentInformation.objects.filter(**my_filter)
         rent_info = []
         for item in results:
@@ -83,6 +83,7 @@ def rent_query(request):
                 'end_time': item.end_time,
                 'status': item.status
             })
+        rent_info.reverse()
         return JsonResponse({"total": total, "rent_info": rent_info})
     return JsonResponse({"error": "wrong request method"})
 
@@ -106,8 +107,8 @@ def rent_request_query(request):
         total = len(results)
         page = parse_int(request.GET.get('page'), 1)
         page_size = parse_int(request.GET.get('page_size'), 20)
-        my_filter['id__gte'] = (page - 1) * page_size
-        my_filter['id__lt'] = page * page_size + 1
+        my_filter['id__gte'] = total - page * page_size + 1
+        my_filter['id__lt'] = total - (page - 1) * page_size + 1
         results = RentRequest.objects.filter(**my_filter)
         rent_req = []
         for item in results:
@@ -122,6 +123,7 @@ def rent_request_query(request):
                 'detail': item.detail,
                 'status': item.status,
             })
+        rent_req.reverse()
         return JsonResponse({"total": total, "rent_req": rent_req})
     return JsonResponse({"error": "wrong request method"})
 

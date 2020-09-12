@@ -68,8 +68,8 @@ def equip_query(request):
         total = len(results)
         page = parse_int(request.GET.get('page'), 1)
         page_size = parse_int(request.GET.get('page_size'), 20)
-        my_filter['id__gte'] = (page - 1) * page_size
-        my_filter['id__lt'] = page * page_size + 1
+        my_filter['id__gte'] = total - page * page_size + 1
+        my_filter['id__lt'] = total - (page - 1) * page_size + 1
         results = Equipment.objects.filter(**my_filter)
         equip = []
         for item in results:
@@ -83,6 +83,7 @@ def equip_query(request):
                 'status': item.status,
                 'username': item.username
             })
+        equip.reverse()
         return JsonResponse({'total': total, 'equip': equip})
     return JsonResponse({"error": "wrong request method"})
 
@@ -192,8 +193,8 @@ def equip_request_query(request):
         total = len(results)
         page = parse_int(request.GET.get('page'), 1)
         page_size = parse_int(request.GET.get('page_size'), 20)
-        my_filter['id__gte'] = (page - 1) * page_size
-        my_filter['id__lt'] = page * page_size + 1
+        my_filter['id__gte'] = total - page * page_size + 1
+        my_filter['id__lt'] = total - (page - 1) * page_size + 1
         results = SaleRequest.objects.filter(**my_filter)
         equip_req = []
         for item in results:
@@ -207,6 +208,7 @@ def equip_request_query(request):
                 "status": item.status,
                 "lab_info": lessor.lab_info
             })
+        equip_req.reverse()
         return JsonResponse({"total": total, "equip_req": equip_req})
     return JsonResponse({"error": "wrong request method"})
 
