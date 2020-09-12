@@ -65,13 +65,7 @@ def logon(request):
     test.rand_str = rand_str
     test.save()
 
-    add_message('all', 0, 0, '用户注册', '新用户(未激活)  用户名:' + test.username + ',学工号:' + str(test.student_id))
-    # new_message = Message()
-    # new_message.type = 'all'
-    # new_message.from_id = new_message.to_id = 0
-    # new_message.title = '用户注册'
-    # new_message.content = '新用户(未激活)  用户名:' + test.username + ',学工号:' + str(test.student_id)
-    # new_message.save()
+    add_message('sys', 0, 0, '用户注册', '新用户(未激活)  用户名:' + test.username + ',学工号:' + str(test.student_id))
 
     return JsonResponse({'message': "ok"})
 
@@ -88,13 +82,7 @@ def active(request, rand_str):
     saved_user.rand_str = ''
     saved_user.save()
 
-    add_message('all', 0, 0, '用户激活', '激活用户  用户名:' + saved_user.username + ',学工号:' + saved_user.student_id)
-    # new_message = Message()
-    # new_message.type = 'all'
-    # new_message.from_id = new_message.to_id = 0
-    # new_message.title = '用户激活'
-    # new_message.content = '激活用户  用户名:' + saved_user.username + ',学工号:' + saved_user.student_id
-    # new_message.save()
+    add_message('sys', 0, 0, '用户激活', '激活用户  用户名:' + saved_user.username + ',学工号:' + saved_user.student_id)
 
     return JsonResponse({"message": "ok"})
 
@@ -136,13 +124,7 @@ def login(request):
     saved_user.save()
     response = JsonResponse({'message': 'ok', 'jwt': rand_str})
 
-    add_message('all', 0, 0, '用户登录', '用户登录  用户名:' + saved_user.username + ',学工号:' + saved_user.student_id)
-    # new_message = Message()
-    # new_message.type = 'all'
-    # new_message.from_id = new_message.to_id = 0
-    # new_message.title = '用户登录'
-    # new_message.content = '用户登录  用户名:' + saved_user.username + ',学工号:' + saved_user.student_id
-    # new_message.save()
+    add_message('sys', 0, 0, '用户登录', '用户登录  用户名:' + saved_user.username + ',学工号:' + saved_user.student_id)
 
     return response
 
@@ -164,13 +146,7 @@ def logout(request):
     saved_user.rand_str = ''
     saved_user.save()
 
-    add_message('all', 0, 0, '用户登出', '用户登出  用户名:' + saved_user.username + ',学工号:' + saved_user.student_id)
-    # new_message = Message()
-    # new_message.type = 'all'
-    # new_message.from_id = new_message.to_id = 0
-    # new_message.title = '用户登出'
-    # new_message.content = '用户登出  用户名:' + saved_user.username + ',学工号:' + saved_user.student_id
-    # new_message.save()
+    add_message('sys', 0, 0, '用户登出', '用户登出  用户名:' + saved_user.username + ',学工号:' + saved_user.student_id)
 
     return response
 
@@ -232,16 +208,10 @@ def set_authority(request):
     set_user.authority = authority
     set_user.save()
 
-    add_message('all', 0, 0, '管理员设置用户权限',
+    add_message('sys', 0, 0, '管理员设置用户权限',
                 '用户名:' + set_user.username + ',学工号:' + set_user.student_id + '\n    权限变更为:' + set_user.authority)
-    # new_message = Message()
-    # new_message.type = 'all'
-    # new_message.from_id = new_message.to_id = 0
-    # new_message.title = '管理员设置用户权限'
-    # new_message.content = '用户名:' + set_user.username + ',学工号:' + set_user.student_id \
-    #                       + '\n    权限变更为:' + set_user.authority
-    # new_message.save()
-    # print("set auth   ", new_message.time)
+    add_message('user', 0, set_user.id, '管理员设置用户权限', '您的权限现已变更为:' +
+                ('普通用户' if set_user.authority == 'user' else '设备提供者'))
 
     return JsonResponse({'message': 'ok'})
 
@@ -263,13 +233,7 @@ def delete_user(request):
         return JsonResponse({"error": "no such user"})
     del_user = User.objects.get(id=user_id)
 
-    add_message('all', 0, 0, '管理员删除用户', '用户名:' + del_user.username + ',学工号:' + del_user.student_id)
-    # new_message = Message()
-    # new_message.type = 'all'
-    # new_message.from_id = new_message.to_id = 0
-    # new_message.title = '管理员删除用户'
-    # new_message.content = '用户名:' + del_user.username + ',学工号:' + del_user.student_id
-    # new_message.save()
+    add_message('sys', 0, 0, '管理员删除用户', '用户名:' + del_user.username + ',学工号:' + del_user.student_id)
 
     del_user.delete()
     return JsonResponse({'message': 'ok'})
@@ -321,25 +285,10 @@ def decide_auth_request(request):
     print('admin decide auth_req :  user_id=', req_user.id)
 
     add_message('user', 0, req_user.id, '权限申请审批结果', '审批结果:' + ('同意' if decision == 'apply' else '拒绝'))
-    # new_message = Message()
-    # new_message.type = 'all'
-    # new_message.from_id = 0
-    # new_message.to_id = req_user.id
-    # new_message.title = '权限申请审批结果'
-    # new_message.content = '审批结果:' + ('同意' if decision == 'apply' else '拒绝')
-    # new_message.save()
 
-    add_message('all', 0, 0, '管理员审批用户权限申请',
+    add_message('sys', 0, 0, '管理员审批用户权限申请',
                 '用户名:' + req_user.username + ',学工号:' + req_user.student_id + '\n 审批结果:'
-                + ('同意' if decision == 'apply' else '拒绝')
-                )
-    # new_message = Message()
-    # new_message.type = 'all'
-    # new_message.from_id = new_message.to_id = 0
-    # new_message.title = '管理员审批用户权限申请'
-    # new_message.content = '用户名:' + req_user.username + ',学工号:' + req_user.student_id + '\n 审批结果:'\
-    #                       + ('同意' if decision == 'apply' else '拒绝')
-    # new_message.save()
+                + ('同意' if decision == 'apply' else '拒绝')                )
 
     return JsonResponse({'message': 'ok'})
 
@@ -365,6 +314,9 @@ def add_auth_request(request):
     auth_req.detail = request.POST['detail']
     auth_req.status = 'pending'
     auth_req.save()
+
+    add_message('sys', 0, 0, '用户申请成为设备提供者',
+                '用户名:' + saved_user.username + ',学工号:' + saved_user.student_id)
 
     return JsonResponse({'message': 'ok'})
 
@@ -421,9 +373,56 @@ def query_auth_request(request):
     # return JsonResponse(json.dumps(return_list, separators=(',', ':'), indent=4))
     return JsonResponse({'total': len(result_list), 'auth_req': return_list})
 
-# def check_login(request):
-#     return 'session_id' in request.COOKIES and len(request.COOKIES['session_id']) > 0\
-#            and User.objects.filter(rand_str=request.COOKIES['session_id']).exists()
+
+def query_message(request):
+    if request.method != 'GET':
+        return JsonResponse({"error": "require GET"})
+
+    if not check_login(request):
+        return JsonResponse({"error": "please login"})
+    saved_user = User.objects.get(rand_str=request.META['HTTP_JWT'])
+    print("user querying message: ", saved_user.username)
+
+    all_index = ['page', 'page_size', 'type', 'to_id']
+    for index in all_index:
+        if index not in request.GET or len(request.GET[index]) == 0:
+            return JsonResponse({"error": "invalid parameters"})
+    if request.GET['type'] not in ['sys', 'user', 'lessor']:
+        return JsonResponse({"error": "invalid parameters"})
+    page_id = int(request.GET['page'])
+    page_size = int(request.GET['page_size'])
+    to_id = int(request.GET['to_id'])
+    msg_type = request.GET['type']
+
+    if (to_id > 0 and msg_type == 'sys') or (to_id == 0 and msg_type != 'sys') or (to_id < 0):
+        return JsonResponse({"error": "invalid parameters"})
+
+    if to_id > 0:
+        if saved_user.authority != 'admin' and saved_user.id != to_id:
+            return JsonResponse({"error": "not admin"})
+        result_list = Message.objects.filter(type=msg_type, to_id=to_id)
+    else:
+        if saved_user.authority != 'admin':
+            return JsonResponse({"error": "not admin"})
+        result_list = Message.objects.filter(type=msg_type)
+    result_list = result_list.order_by('-id')
+    left = min(len(result_list), (page_id-1)*page_size)
+    right = min(len(result_list), page_id*page_size)
+    return_list = []
+    i = left
+    while i < right:
+        item = result_list[i]
+        # print("TRY!!! ", item.user_id)
+        # temp_user = User.objects.get(id=item.user_id)
+        if item.from_id == 0:
+            from_name = '系统消息'
+        else:
+            from_name = User.objects.get(id=item.from_id).username
+        return_list.append({'from': from_name, 'title': item.title, 'content': item.content, 'time': item.time})
+        i += 1
+
+    # return JsonResponse(json.dumps(return_list, separators=(',', ':'), indent=4))
+    return JsonResponse({'total': len(result_list), 'auth_req': return_list})
 
 
 def check_login(request):

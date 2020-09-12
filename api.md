@@ -439,11 +439,37 @@ filter是虚的，拆开的话不留filter
     			'contact':
     			'status': ''
 			}
-    ]
+    	]
     }
     
     ```
     
+20. 查看系统日志/查看消息通知
+
+    ```
+    Method: GET
+    url: api/user/message/query
+    QueryParam:
+    {
+    	'type': 'sys'/'user'/'lessor'  // 分别表示系统日志,给user的消息,给lessor的消息
+    	'to_id': 		// 表示消息接收者的id 设为0表示要查系统日志
+    	'page':
+    	'page_size':
+    }
+    Response:
+    {
+    	'total':
+    	'message_list': [
+    		{
+    			'from': ''
+    			'title': ''
+    			'content': ''
+    			'time': ''
+    		}
+    	]
+    }
+    ```
+
     
 
 ### 2. 普通用户

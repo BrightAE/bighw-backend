@@ -4,7 +4,7 @@ from django.utils import timezone
 
 
 class Message(models.Model):
-    type = models.CharField(max_length=10, default='all')
+    type = models.CharField(max_length=10, default='sys')
     from_id = models.IntegerField(default=0)
     to_id = models.IntegerField(default=0)
     title = models.CharField(max_length=60, default='default_title')
