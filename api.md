@@ -19,6 +19,7 @@ filter是虚的，拆开的话不留filter
    	'filter': 'None' / 'lessor' //设置是否只显示租借者信息
    	'page':
    	'page_size':
+   	'sort_key': // 可不传,有的话应为'equip_sum'/'contribution'/'activity'之一 ,表示根据拥有设备总数/租出设备总次数/借入设备总次数排序
    }
    Response:
    {
@@ -470,6 +471,26 @@ filter是虚的，拆开的话不留filter
     }
     ```
 
+21. 查看平台整体统计：
+
+    ```
+    Method: GET
+    url: api/user/statistics/query
+    QueryParam:
+    {
+    }
+    Response:
+    {
+    	'tot_account': 	// 账户总数
+    	'tot_lessor':
+    	'tot_equip':
+    	'tot_rent_req':		// 总租借申请次数
+    	'tot_rent_info':	// 总租借次数
+    	'tot_beneficiary' // 租借过设备的用户总数
+    	
+    }
+    ```
+
     
 
 ### 2. 普通用户
@@ -517,6 +538,14 @@ filter是虚的，拆开的话不留filter
    	'error': ''
    }
    ```
+   
+6. 查询消息通知：使用1.20
+
+
+
+
+
+
 
 ### 3. 实验室工作助理（设备提供者）
 
@@ -593,9 +622,7 @@ filter是虚的，拆开的话不留filter
        'error': ''
    }
    ```
-```
    
-   
+10. 查询消息通知：用1.20
 
-
-```
+    

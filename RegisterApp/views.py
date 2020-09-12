@@ -228,12 +228,16 @@ def delete_user(request):
     print("admin deleting: ", saved_user.username)
     if 'user_id' not in request.POST or len(request.POST['user_id']) == 0:
         return JsonResponse({"error": "invalid parameters"})
-    user_id = request.POST['user_id']
+    user_id = int(request.POST['user_id'])
     if not User.objects.filter(id=user_id).exists():
         return JsonResponse({"error": "no such user"})
     del_user = User.objects.get(id=user_id)
 
     add_message('sys', 0, 0, '管理员删除用户', '用户名:' + del_user.username + ',学工号:' + del_user.student_id)
+
+    del_auth_req_list = AuthorityRequest.objects.filter(user_id=user_id)
+    for del_auth_req in del_auth_req_list:
+        del_auth_req.delete()
 
     del_user.delete()
     return JsonResponse({'message': 'ok'})
