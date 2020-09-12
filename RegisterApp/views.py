@@ -422,7 +422,7 @@ def query_message(request):
         i += 1
 
     # return JsonResponse(json.dumps(return_list, separators=(',', ':'), indent=4))
-    return JsonResponse({'total': len(result_list), 'auth_req': return_list})
+    return JsonResponse({'total': len(result_list), 'message_list': return_list})
 
 
 def check_login(request):
