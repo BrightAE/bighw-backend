@@ -19,7 +19,7 @@ filter是虚的，拆开的话不留filter
    	'filter': 'None' / 'lessor' //设置是否只显示租借者信息
    	'page':
    	'page_size':
-   	'sort_key': // 可不传,有的话应为'equip_sum'/'contribution'/'activity'之一 ,表示根据拥有设备总数/租出设备总次数/借入设备总次数排序
+   	'sorted_by': // 可不传,有的话应为'equip_sum'/'contribution'/'activity'之一 ,表示根据拥有设备总数/租出设备总次数/借入设备总次数排序
    }
    Response:
    {
@@ -87,6 +87,7 @@ filter是虚的，拆开的话不留filter
    		'username':
    		'user_id':
    	}
+   	'ordered_by': ''
    	'page':
    	'page_size':
    }
@@ -161,6 +162,7 @@ filter是虚的，拆开的话不留filter
    		'lessor_name': ''
    		'username': ''
    	}
+   	'ordered_by':
    	'page_size':
    	'page':
    }
@@ -201,6 +203,7 @@ filter是虚的，拆开的话不留filter
    		'equip_name': ''
    		'equip_id':
    	}
+   	'ordered_by': ''
    	'page_size':
        'page':
    }
@@ -237,6 +240,7 @@ filter是虚的，拆开的话不留filter
    		'equip_id':
    		'end_time': ''
    	}
+   	'ordered_by': ''
    }
    Response:
    {
@@ -247,8 +251,8 @@ filter是虚的，拆开的话不留filter
    		'equip_name': ''
    		'end_time': ''
    		'lab_info': ''
-   		'lessor_name':''
-			'status': 'apply' / 'reject' / 'pending'
+			'lessor_name':''
+   		'status': 'apply' / 'reject' / 'pending'
    	]
    	'error': ''
    }
