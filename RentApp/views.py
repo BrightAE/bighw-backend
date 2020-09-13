@@ -63,15 +63,17 @@ def rent_query(request):
             my_filter = get_filter(request, filter_eles)
         except Exception:
             return JsonResponse({"error": "invalid filter parameters"})
-        results = RentInformation.objects.filter(**my_filter)
+        if 'ordered_by' in request.POST:
+            ordered_by = request.POST.get('ordered_by')
+        else:
+            ordered_by = '-id'
+        results = RentInformation.objects.filter(**my_filter).order_by(ordered_by)
         total = len(results)
         page = parse_int(request.GET.get('page'), 1)
         page_size = parse_int(request.GET.get('page_size'), 20)
-        my_filter['id__gte'] = total - page * page_size + 1
-        my_filter['id__lt'] = total - (page - 1) * page_size + 1
-        results = RentInformation.objects.filter(**my_filter)
         rent_info = []
-        for item in results:
+        for i in range((page-1)*page_size, page*page_size+1):
+            item = results[i]
             rent_info.append({
                 'rent_id': item.id,
                 'equip_id': item.equip_id,
@@ -83,7 +85,6 @@ def rent_query(request):
                 'end_time': item.end_time,
                 'status': item.status
             })
-        rent_info.reverse()
         return JsonResponse({"total": total, "rent_info": rent_info})
     return JsonResponse({"error": "wrong request method"})
 
@@ -103,15 +104,17 @@ def rent_request_query(request):
             my_filter = get_filter(request, filter_eles)
         except Exception:
             return JsonResponse({"error": "invalid filter parameters"})
-        results = RentRequest.objects.filter(**my_filter)
+        if 'ordered_by' in request.POST:
+            ordered_by = request.POST.get('ordered_by')
+        else:
+            ordered_by = '-id'
+        results = RentRequest.objects.filter(**my_filter).order_by(ordered_by)
         total = len(results)
         page = parse_int(request.GET.get('page'), 1)
         page_size = parse_int(request.GET.get('page_size'), 20)
-        my_filter['id__gte'] = total - page * page_size + 1
-        my_filter['id__lt'] = total - (page - 1) * page_size + 1
-        results = RentRequest.objects.filter(**my_filter)
         rent_req = []
-        for item in results:
+        for i in range((page-1)*page_size, page*page_size+1):
+            item = request[i]
             rent_req.append({
                 'rent_req_id': item.id,
                 'equip_id': item.equip_id,
@@ -123,7 +126,6 @@ def rent_request_query(request):
                 'detail': item.detail,
                 'status': item.status,
             })
-        rent_req.reverse()
         return JsonResponse({"total": total, "rent_req": rent_req})
     return JsonResponse({"error": "wrong request method"})
 

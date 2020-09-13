@@ -64,15 +64,17 @@ def equip_query(request):
             my_filter = get_filter(request, filter_eles)
         except Exception:
             return JsonResponse({"error": "invalid filter parameters"})
-        results = Equipment.objects.filter(**my_filter)
+        if 'ordered_by' in request.POST:
+            ordered_by = request.POST.get('ordered_by')
+        else:
+            ordered_by = '-id'
+        results = Equipment.objects.filter(**my_filter).order_by(ordered_by)
         total = len(results)
         page = parse_int(request.GET.get('page'), 1)
         page_size = parse_int(request.GET.get('page_size'), 20)
-        my_filter['id__gte'] = total - page * page_size + 1
-        my_filter['id__lt'] = total - (page - 1) * page_size + 1
-        results = Equipment.objects.filter(**my_filter)
         equip = []
-        for item in results:
+        for i in range((page-1)*page_size, page*page_size+1):
+            item = results[i]
             equip.append({
                 'equip_id': item.id,
                 'equip_name': item.equip_name,
@@ -83,7 +85,6 @@ def equip_query(request):
                 'status': item.status,
                 'username': item.username
             })
-        equip.reverse()
         return JsonResponse({'total': total, 'equip': equip})
     return JsonResponse({"error": "wrong request method"})
 
@@ -189,15 +190,17 @@ def equip_request_query(request):
             my_filter = get_filter(request, filter_eles)
         except Exception:
             return JsonResponse({"error": "invaild filter parameters"})
-        results = SaleRequest.objects.filter(**my_filter)
+        if 'ordered_by' in request.POST:
+            ordered_by = request.POST.get('ordered_by')
+        else:
+            ordered_by = '-id'
+        results = SaleRequest.objects.filter(**my_filter).order_by(ordered_by)
         total = len(results)
         page = parse_int(request.GET.get('page'), 1)
         page_size = parse_int(request.GET.get('page_size'), 20)
-        my_filter['id__gte'] = total - page * page_size + 1
-        my_filter['id__lt'] = total - (page - 1) * page_size + 1
-        results = SaleRequest.objects.filter(**my_filter)
         equip_req = []
-        for item in results:
+        for i in range((page-1)*page_size, page*page_size+1):
+            item = results[i]
             lessor = User.objects.get(username=item.lessor_name)
             equip_req.append({
                 "sale_req_id": item.id,
@@ -208,7 +211,6 @@ def equip_request_query(request):
                 "status": item.status,
                 "lab_info": lessor.lab_info
             })
-        equip_req.reverse()
         return JsonResponse({"total": total, "equip_req": equip_req})
     return JsonResponse({"error": "wrong request method"})
 
