@@ -258,7 +258,7 @@ def rent_confirm(request):
         rent_info.status = 'returned'
         equip.status = 'onsale'
         rent_info.save()
-        equip.username = None
+        equip.username = ''
         equip.save()
         add_message('sys', user.id, 0, '确认归还','用户'+user.username+'归还了设备'+equip.equip_name)
         add_message('lessor', lessor.id, user.id, '确认归还', '出租方确认了您的归还')
