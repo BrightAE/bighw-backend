@@ -103,7 +103,8 @@ def equip_query(request):
                     'end_time': item.end_time,
                     'contact': item.contact,
                     'status': item.status,
-                    'username': item.username
+                    'username': item.username,
+                    'score': float(item.score),
                 })
         return JsonResponse({'total': total, 'equip': equip})
     return JsonResponse({"error": "wrong request method"})
@@ -197,8 +198,10 @@ def equip_add(request):
         equip.status = 'unavailable'
         equip.end_time = '1970-01-01'
         equip.username = 'none'
+        equip.score = '0'
+        equip.score_count = '0'
         equip.save()
-        add_message('sys', 0, 0, '添加设备', '添加设备'+equip.equip_name)
+        add_message('sys', user.id, 0, '添加设备', '添加设备'+equip.equip_name)
         return JsonResponse({"message": "ok"})
     return JsonResponse({"error": "wrong request method"})
 

@@ -225,6 +225,7 @@ def rent_request_add(request):
             return JsonResponse({"error": "this equipment is not available"})
         # user = User.objects.get(rand_str=request.COOKIES['session_id'])
         user = User.objects.get(rand_str=request.headers.get('jwt'))
+        lessor = User.objects.get(username=equip.lessor_name)
         rent_req = RentRequest(
             username=user.username,
             lessor_name=equip.lessor_name,
@@ -236,6 +237,7 @@ def rent_request_add(request):
             return_time=return_time
         )
         add_message('sys', user.id, 0, '添加租借申请', '用户'+user.username+'申请租借设备'+equip.equip_name)
+        add_message('sys', user.id, lessor.id, '添加租借申请', '用户'+user.username+'申请租借您的设备'+equip.equip_name)
         rent_req.save()
         return JsonResponse({"message": "ok"})
     return JsonResponse({"error": "wrong request method"})

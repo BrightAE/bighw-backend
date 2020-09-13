@@ -487,6 +487,7 @@ def add_evaluation(request):
     if user_id != saved_user.id or username != saved_user.username:
         return JsonResponse({"error": "not current user"})
     rent_info = RentInformation.objects.get(id=rent_id)
+    equip = Equipment.objects.get(lessor_name=rent_info.lessor_name)
     if rent_info.username != username:
         return JsonResponse({"error": "rent_info belongs to other user!"})
     if not User.objects.filter(username=rent_info.lessor_name).exists:
@@ -499,6 +500,19 @@ def add_evaluation(request):
     eva.content = request.POST['content']
     eva.score = int(request.POST['score'])
     eva.save()
+
+    if(equip.score == 'none'):
+        score = 0
+    else:
+        score = float(equip.score)
+    score_count = float(equip.score_count)
+    scoretotal = score * score_count + eva.score
+    score_count = score_count + 1
+    score = str(scoretotal / score_count)
+    score_count = str(score_count)
+    equip.score = score
+    equip.score_count = score_count
+    equip.save()
 
     rent_info.status = 'evaluated'
     rent_info.save()

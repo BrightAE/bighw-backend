@@ -11,6 +11,8 @@ class Equipment(models.Model):
     end_time = models.DateField()
     contact = models.CharField(max_length=200)
     status = models.CharField(max_length=200)
+    score = models.CharField(max_length=100)
+    score_count = models.CharField(max_length=100)
 
 
 class SaleRequest(models.Model):
