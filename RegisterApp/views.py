@@ -487,7 +487,7 @@ def add_evaluation(request):
     if user_id != saved_user.id or username != saved_user.username:
         return JsonResponse({"error": "not current user"})
     rent_info = RentInformation.objects.get(id=rent_id)
-    equip = Equipment.objects.get(lessor_name=rent_info.lessor_name)
+    equip = Equipment.objects.get(id=rent_info.equip_id)
     if rent_info.username != username:
         return JsonResponse({"error": "rent_info belongs to other user!"})
     if not User.objects.filter(username=rent_info.lessor_name).exists:
@@ -510,6 +510,7 @@ def add_evaluation(request):
     score_count = score_count + 1
     score = str(scoretotal / score_count)
     score_count = str(score_count)
+    print(score, score_count)
     equip.score = score
     equip.score_count = score_count
     equip.save()
