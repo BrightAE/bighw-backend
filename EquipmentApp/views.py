@@ -4,7 +4,10 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from UserApp.models import User
 from .models import Equipment, SaleRequest
+from RentApp.models import RentInformation, RentRequest
 from fuzzywuzzy import fuzz
+from MessageApp.models import Message
+from MessageApp.add_message import add_message
 
 def judge_cookie(request):
     try:
@@ -43,6 +46,11 @@ def get_filter(request, filter_eles):
             if filter_eles[name] == 'int':
                 my_filter[name] = int(my_filter[name])
     return my_filter
+
+
+def delete_item(items):
+    for item in items:
+        item.delete()
 
 
 def equip_query(request):
@@ -136,6 +144,7 @@ def equip_set(request):
         for item in set_info:
             equip.__setattr__(item, set_info[item])
         equip.save()
+        add_message('sys', user.id, 0, '修改设备信息', '修改设备'+equip.equip_name+'的信息')
         return JsonResponse({"message": "ok"})
     return JsonResponse({"error": "wrong request method"})
 
@@ -156,6 +165,13 @@ def equip_delete(request):
                 raise RuntimeError
         except Exception:
             return JsonResponse({"error": "this is not your equipment"})
+        sale_requests = SaleRequest.objects.filter(equip_id=equip.id)
+        rent_info = RentInformation.objects.filter(equip_id=equip.id)
+        rent_req = RentRequest.objects.filter(equip_id=equip.id)
+        delete_item(sale_requests)
+        delete_item(rent_info)
+        delete_item(rent_req)
+        add_message('sys', user.id, 0, '删除设备', '删除设备'+equip.equip_name)
         equip.delete()
         return JsonResponse({"message": "ok"})
     return JsonResponse({"error": "wrong request method"})
@@ -181,6 +197,7 @@ def equip_add(request):
         equip.end_time = '1970-01-01'
         equip.username = 'none'
         equip.save()
+        add_message('sys', 0, 0, '添加设备', '添加设备'+equip.equip_name)
         return JsonResponse({"message": "ok"})
     return JsonResponse({"error": "wrong request method"})
 
@@ -248,9 +265,12 @@ def equip_request_decide(request):
         except Exception:
             return JsonResponse({"error": "no such a sale request"})
         equip = Equipment.objects.get(id=sale_req.equip_id)
+        lessor = User.objects.get(username=equip.lessor_name)
         if decision == 'reject':
             sale_req.status = 'reject'
             sale_req.save()
+            add_message('sys', 0, 0, '拒绝上架申请'+equip.equip_name)
+            add_message('lessor',0, lessor.id, '管理员拒绝了您的上架申请')
             return JsonResponse({"message": "ok"})
         elif decision == 'apply':
             sale_req.status = 'apply'
@@ -258,6 +278,8 @@ def equip_request_decide(request):
             equip.end_time = sale_req.end_time
             equip.save()
             sale_req.save()
+            add_message('sys', 0, 0, '同意上架申请'+equip.equip_name)
+            add_message('lessor',0, lessor.id, '管理员同意了您的上架申请')
             return JsonResponse({"message": "ok"})
         else:
             return JsonResponse({"error": "invalid decision"})
@@ -288,5 +310,6 @@ def equip_request_add(request):
         sale_req.lessor_name = equip.lessor_name
         sale_req.status = 'pending'
         sale_req.save()
+        add_message('sys', 0, 0, '添加上架申请', '设备'+equip.equip_name+'添加了上架申请')
         return JsonResponse({"message": "ok"})
     return JsonResponse({"error": "wrong request method"})

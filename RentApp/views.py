@@ -5,6 +5,8 @@ from django.http import HttpResponse, JsonResponse
 from UserApp.models import User
 from EquipmentApp.models import Equipment
 from .models import RentInformation, RentRequest
+from MessageApp.models import Message
+from MessageApp.add_message import add_message
 import json
 
 def judge_cookie(request):
@@ -152,11 +154,15 @@ def rent_request_decide(request):
         except Exception:
             return JsonResponse({"error": "no such a rent request"})
         equip = Equipment.objects.get(id=rent_req.equip_id)
+        lessor = User.objects.get(username=equip.lessor_name)
+        user = User.objects.get(username=rent_req.username)
         if equip.status != 'onsale':
             return JsonResponse({"error": "this equipment is not available"})
         if decision == 'reject':
             rent_req.status = 'reject'
             rent_req.save()
+            add_message('sys', lessor.id, 0, '拒绝租借申请', '用户'+lessor.username+'拒绝了用户'+user.username+'的拒绝申请')
+            add_message('user', lessor.id, user.id, '拒绝租借申请', '出租方拒绝了您的租借申请')
             return JsonResponse({"message": "ok"})
         elif decision == 'apply':
             rent_req.status = 'apply'
@@ -175,6 +181,8 @@ def rent_request_decide(request):
             rent_req.save()
             equip.save()
             rent_info.save()
+            add_message('sys', lessor.id, 0, '同意租借申请', '用户' + lessor.username + '同意了用户' + user.username + '的拒绝申请')
+            add_message('user', lessor.id, user.id, '同意租借申请', '出租方同意了您的租借申请')
             return JsonResponse({"message": "ok"})
         else:
             return JsonResponse({"error": "invalid decision"})
@@ -214,6 +222,7 @@ def rent_request_add(request):
             start_time=start_time,
             return_time=return_time
         )
+        add_message('sys', user.id, 0, '添加租借申请', '用户'+user.id+'申请租借设备'+equip.equip_name)
         rent_req.save()
         return JsonResponse({"message": "ok"})
     return JsonResponse({"error": "wrong request method"})
@@ -231,9 +240,14 @@ def rent_confirm(request):
             equip = Equipment.objects.get(id=rent_info.equip_id)
         except Exception:
             return JsonResponse({"error": "no such rent infomation"})
+        user = User.objects.get(username=equip.username)
+        lessor = User.objects.get(username=equip.username)
         rent_info.status = 'returned'
         equip.status = 'onsale'
         rent_info.save()
+        equip.username = None
         equip.save()
+        add_message('sys', user.id, 0, '确认归还','用户'+user.username+'归还了设备'+equip.equip_name)
+        add_message('lessor', lessor.id, user.id, '确认归还', '出租方确认了您的归还')
         return JsonResponse({"message": "ok"})
     return JsonResponse({"error": "wrong request method"})
