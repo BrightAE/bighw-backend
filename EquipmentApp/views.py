@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from UserApp.models import User
 from .models import Equipment, SaleRequest
-
+from fuzzywuzzy import fuzz
 
 def judge_cookie(request):
     try:
@@ -56,7 +56,6 @@ def equip_query(request):
             'status': 'str',
             'lessor_name': 'str',
             'lessor_id': 'int',
-            'name_search': 'str',
             'username': 'str',
             'user_id': 'int',
         }
@@ -73,20 +72,28 @@ def equip_query(request):
         page = parse_int(request.GET.get('page'), 1)
         page_size = parse_int(request.GET.get('page_size'), 20)
         equip = []
+        if 'name_search' in request.POST:
+            name_search = request.POST.get('name_search')
         for i in range((page-1)*page_size, page*page_size):
             if i >= len(results):
                 break
             item = results[i]
-            equip.append({
-                'equip_id': item.id,
-                'equip_name': item.equip_name,
-                'lessor_name': item.lessor_name,
-                'address': item.address,
-                'end_time': item.end_time,
-                'contact': item.contact,
-                'status': item.status,
-                'username': item.username
-            })
+            if_add = 1
+            if name_search != '' and name_search != None:
+                value = fuzz.token_sort_ratio(name_search, item.equip_name)
+                if value < 40:
+                    if_add = 0
+            if if_add == 1:
+                equip.append({
+                    'equip_id': item.id,
+                    'equip_name': item.equip_name,
+                    'lessor_name': item.lessor_name,
+                    'address': item.address,
+                    'end_time': item.end_time,
+                    'contact': item.contact,
+                    'status': item.status,
+                    'username': item.username
+                })
         return JsonResponse({'total': total, 'equip': equip})
     return JsonResponse({"error": "wrong request method"})
 
@@ -187,6 +194,7 @@ def equip_request_query(request):
             'equip_name': 'str',
             'equip_id': 'int',
             'end_time': 'str',
+            'status': 'str',
         }
         try:
             my_filter = get_filter(request, filter_eles)

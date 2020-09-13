@@ -57,7 +57,8 @@ def rent_query(request):
             'lessor_id': 'int',
             'lessor_name': 'str',
             'user_id': 'int',
-            'username': 'str'
+            'username': 'str',
+            'status': 'str'
         }
         try:
             my_filter = get_filter(request, filter_eles)
@@ -100,7 +101,8 @@ def rent_request_query(request):
             'lessor_id': 'int',
             'lessor_name': 'str',
             'user_id': 'int',
-            'username': 'str'
+            'username': 'str',
+            'status': 'str',
         }
         try:
             my_filter = get_filter(request, filter_eles)
