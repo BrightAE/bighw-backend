@@ -64,8 +64,8 @@ def rent_query(request):
             my_filter = get_filter(request, filter_eles)
         except Exception:
             return JsonResponse({"error": "invalid filter parameters"})
-        if 'ordered_by' in request.POST:
-            ordered_by = request.POST.get('ordered_by')
+        if 'ordered_by' in request.GET:
+            ordered_by = request.GET.get('ordered_by')
         else:
             ordered_by = '-id'
         results = RentInformation.objects.filter(**my_filter).order_by(ordered_by)
@@ -91,6 +91,7 @@ def rent_query(request):
         return JsonResponse({"total": total, "rent_info": rent_info})
     return JsonResponse({"error": "wrong request method"})
 
+
 def rent_request_query(request):
     if request.method == 'GET':
         if judge_cookie(request) is False:
@@ -108,8 +109,8 @@ def rent_request_query(request):
             my_filter = get_filter(request, filter_eles)
         except Exception:
             return JsonResponse({"error": "invalid filter parameters"})
-        if 'ordered_by' in request.POST:
-            ordered_by = request.POST.get('ordered_by')
+        if 'ordered_by' in request.GET:
+            ordered_by = request.GET.get('ordered_by')
         else:
             ordered_by = '-id'
         results = RentRequest.objects.filter(**my_filter).order_by(ordered_by)
@@ -117,10 +118,12 @@ def rent_request_query(request):
         page = parse_int(request.GET.get('page'), 1)
         page_size = parse_int(request.GET.get('page_size'), 20)
         rent_req = []
+        print(len(results))
         for i in range((page-1)*page_size, page*page_size):
             if i >= len(results):
                 break
-            item = request[i]
+            print(i)
+            item = results[i]
             rent_req.append({
                 'rent_req_id': item.id,
                 'equip_id': item.equip_id,

@@ -63,10 +63,11 @@ def equip_query(request):
             my_filter = get_filter(request, filter_eles)
         except Exception:
             return JsonResponse({"error": "invalid filter parameters"})
-        if 'ordered_by' in request.POST:
-            ordered_by = request.POST.get('ordered_by')
+        if 'ordered_by' in request.GET:
+            ordered_by = request.GET.get('ordered_by')
         else:
             ordered_by = '-id'
+        print('ordered_by', ordered_by)
         results = Equipment.objects.filter(**my_filter).order_by(ordered_by)
         total = len(results)
         page = parse_int(request.GET.get('page'), 1)
@@ -202,8 +203,8 @@ def equip_request_query(request):
             my_filter = get_filter(request, filter_eles)
         except Exception:
             return JsonResponse({"error": "invaild filter parameters"})
-        if 'ordered_by' in request.POST:
-            ordered_by = request.POST.get('ordered_by')
+        if 'ordered_by' in request.GET:
+            ordered_by = request.GET.get('ordered_by')
         else:
             ordered_by = '-id'
         results = SaleRequest.objects.filter(**my_filter).order_by(ordered_by)
