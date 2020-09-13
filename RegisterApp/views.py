@@ -169,6 +169,14 @@ def query_all(request):
     page_size = int(request.GET['page_size'])
     result_list = User.objects.all()
     result_list = result_list.order_by('-id')
+    # print(request.GET)
+    if 'sort_key' in request.GET:
+        sort_key = request.GET['sort_key']
+        if sort_key not in ['contribution', 'equip_sum', 'activity']:
+            return JsonResponse({"error": "invalid parameters"})
+        # print("!!!", sort_key)
+        result_list = result_list.order_by('-'+sort_key)
+
     if filt == 'lessor':
         result_list = User.objects.filter(authority='lessor')
     left = min(len(result_list), (page_id-1)*page_size)
@@ -179,7 +187,8 @@ def query_all(request):
         tmp = result_list[i]
         return_list.append({'username': tmp.username, 'student_id': tmp.student_id, 'user_id': tmp.id,
                             'email': tmp.email, 'contact': tmp.contact, 'authority': tmp.authority,
-                            'lab_info': tmp.lab_info})
+                            'lab_info': tmp.lab_info, 'equip_sum': tmp.equip_sum, 'contribution': tmp.contribution,
+                            'activity': tmp.activity})
         i += 1
 
     # return JsonResponse(json.dumps(return_list, separators=(',', ':'), indent=4))
