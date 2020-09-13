@@ -72,7 +72,9 @@ def rent_query(request):
         page = parse_int(request.GET.get('page'), 1)
         page_size = parse_int(request.GET.get('page_size'), 20)
         rent_info = []
-        for i in range((page-1)*page_size, page*page_size+1):
+        for i in range((page-1)*page_size, page*page_size):
+            if i >= len(results):
+                break
             item = results[i]
             rent_info.append({
                 'rent_id': item.id,
@@ -113,7 +115,9 @@ def rent_request_query(request):
         page = parse_int(request.GET.get('page'), 1)
         page_size = parse_int(request.GET.get('page_size'), 20)
         rent_req = []
-        for i in range((page-1)*page_size, page*page_size+1):
+        for i in range((page-1)*page_size, page*page_size):
+            if i >= len(results):
+                break
             item = request[i]
             rent_req.append({
                 'rent_req_id': item.id,

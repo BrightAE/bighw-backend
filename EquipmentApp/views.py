@@ -73,7 +73,9 @@ def equip_query(request):
         page = parse_int(request.GET.get('page'), 1)
         page_size = parse_int(request.GET.get('page_size'), 20)
         equip = []
-        for i in range((page-1)*page_size, page*page_size+1):
+        for i in range((page-1)*page_size, page*page_size):
+            if i >= len(results):
+                break
             item = results[i]
             equip.append({
                 'equip_id': item.id,
@@ -199,7 +201,9 @@ def equip_request_query(request):
         page = parse_int(request.GET.get('page'), 1)
         page_size = parse_int(request.GET.get('page_size'), 20)
         equip_req = []
-        for i in range((page-1)*page_size, page*page_size+1):
+        for i in range((page-1)*page_size, page*page_size):
+            if i >= len(results):
+                break
             item = results[i]
             lessor = User.objects.get(username=item.lessor_name)
             equip_req.append({
