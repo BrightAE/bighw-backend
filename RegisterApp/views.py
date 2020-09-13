@@ -12,6 +12,7 @@ from MessageApp.add_message import add_message
 import RegisterApp.send_email
 import random
 import string
+import datetime
 # import json
 # import time
 
@@ -263,7 +264,7 @@ def user_info(request):
     user = User.objects.get(rand_str=request.META['HTTP_JWT'])
 
     return JsonResponse({'user_id': user.id, 'student_id': user.student_id, 'username': user.username,
-                         'authority': user.authority})
+                         'authority': user.authority, 'local_date': datetime.datetime.now().strftime('%Y-%m-%d')})
 
 
 def decide_auth_request(request):
