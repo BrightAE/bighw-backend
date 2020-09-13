@@ -72,14 +72,16 @@ def equip_query(request):
         page = parse_int(request.GET.get('page'), 1)
         page_size = parse_int(request.GET.get('page_size'), 20)
         equip = []
-        if 'name_search' in request.POST:
-            name_search = request.POST.get('name_search')
+        if 'name_search' in request.GET:
+            name_search = request.GET.get('name_search')
+        else:
+            name_search = ''
         for i in range((page-1)*page_size, page*page_size):
             if i >= len(results):
                 break
             item = results[i]
             if_add = 1
-            if name_search != '' and name_search != None:
+            if name_search != '' and name_search is not None:
                 value = fuzz.token_sort_ratio(name_search, item.equip_name)
                 if value < 40:
                     if_add = 0

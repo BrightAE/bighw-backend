@@ -4,7 +4,9 @@
 from django.http import HttpResponse
 from django.http import JsonResponse
 from UserApp.models import User, AuthorityRequest
+from EquipmentApp.models import Equipment
 from MessageApp.models import Message
+from RentApp.models import RentRequest, RentInformation
 from MessageApp.add_message import add_message
 # from django.contrib.auth.hashers import make_password, check_password
 import RegisterApp.send_email
@@ -427,6 +429,29 @@ def query_message(request):
 
     # return JsonResponse(json.dumps(return_list, separators=(',', ':'), indent=4))
     return JsonResponse({'total': len(result_list), 'message_list': return_list})
+
+
+def query_statistics(request):
+    if request.method != 'GET':
+        return JsonResponse({"error": "require GET"})
+
+    if not check_login(request):
+        return JsonResponse({"error": "please login"})
+    saved_user = User.objects.get(rand_str=request.META['HTTP_JWT'])
+    print("user querying statistics: ", saved_user.username)
+
+    tot_account = len(User.objects.all())
+    tot_lessor = len(User.objects.filter(authority='lessor'))
+    tot_equip = len(Equipment.objects.all())
+    tot_rent_req = len(RentRequest.objects.all())
+    tot_rent_info = len(RentInformation.objects.all())
+    tot_beneficiary = 0
+    for user in User.objects.all():
+        if RentInformation.objects.filter(username=user.username).exists():
+            tot_beneficiary += 1
+    return JsonResponse({'tot_account': tot_account, 'tot_lessor': tot_lessor, 'tot_equip': tot_equip,
+                         'tot_rent_req': tot_rent_req, 'tot_rent_info': tot_rent_info,
+                         'tot_beneficiary': tot_beneficiary})
 
 
 def check_login(request):
