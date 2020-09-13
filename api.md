@@ -491,6 +491,30 @@ filter是虚的，拆开的话不留filter
     }
     ```
 
+22. 查看设备评价：
+
+    ```
+    Method: GET
+    url: api/user/evaluation/query
+    QueryParam:
+    {
+    	'equip_id':
+    }
+    Response:
+    {
+    	'total':
+    	'evaluation_list':[
+    		{
+    			'username': ''
+    			'content': ''
+    			'score': 
+    			'time': ''
+    		}
+    	]
+    	
+    }
+    ```
+
     
 
 ### 2. 普通用户
@@ -540,6 +564,26 @@ filter是虚的，拆开的话不留filter
    ```
    
 6. 查询消息通知：使用1.20
+
+7. 评价设备
+
+   ```
+   Method: POST
+   url: api/user/evaluation/add
+   Request:
+   {
+   	'rent_id':
+   	'user_id':
+   	'username':
+   	'equip_id':
+   	'content':	''
+   	'score':
+   }
+   ```
+
+   
+
+
 
 
 

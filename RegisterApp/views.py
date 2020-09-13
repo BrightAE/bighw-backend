@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from UserApp.models import User, AuthorityRequest
 from EquipmentApp.models import Equipment
-from MessageApp.models import Message
+from MessageApp.models import Message, Evaluation
 from RentApp.models import RentRequest, RentInformation
 from MessageApp.add_message import add_message
 # from django.contrib.auth.hashers import make_password, check_password
@@ -171,12 +171,12 @@ def query_all(request):
     result_list = User.objects.all()
     result_list = result_list.order_by('-id')
     # print(request.GET)
-    if 'sort_key' in request.GET:
-        sort_key = request.GET['sort_key']
-        if sort_key not in ['contribution', 'equip_sum', 'activity']:
+    if 'sorted_by' in request.GET:
+        sorted_by = request.GET['sorted_by']
+        if sorted_by not in ['contribution', 'equip_sum', 'activity']:
             return JsonResponse({"error": "invalid parameters"})
-        # print("!!!", sort_key)
-        result_list = result_list.order_by('-'+sort_key)
+        # print("!!!", sorted_by)
+        result_list = result_list.order_by('-'+sorted_by)
 
     if filt == 'lessor':
         result_list = User.objects.filter(authority='lessor')
@@ -462,6 +462,77 @@ def query_statistics(request):
     return JsonResponse({'tot_account': tot_account, 'tot_lessor': tot_lessor, 'tot_equip': tot_equip,
                          'tot_rent_req': tot_rent_req, 'tot_rent_info': tot_rent_info,
                          'tot_beneficiary': tot_beneficiary})
+
+
+def add_evaluation(request):
+    if request.method != 'POST':
+        return JsonResponse({"error": "require POST"})
+
+    if not check_login(request):
+        return JsonResponse({"error": "please login"})
+    saved_user = User.objects.get(rand_str=request.META['HTTP_JWT'])
+    if saved_user.authority != 'user':
+        return JsonResponse({"error": "not a normal user"})
+    print("user evaluating: ", saved_user.username)
+    all_index = ['rent_id', 'user_id', 'username', 'equip_id', 'content', 'score']
+    for index in all_index:
+        if index not in request.POST or len(request.POST[index]) == 0:
+            return JsonResponse({"error": "invalid parameters"})
+    rent_id = int(request.POST['rent_id'])
+    if not RentInformation.objects.filter(id=rent_id).exists():
+        return JsonResponse({"error": "no such rent information"})
+
+    user_id = int(request.POST['user_id'])
+    username = int(request.POST['username'])
+    if user_id != saved_user.id or username != saved_user.username:
+        return JsonResponse({"error": "not current user"})
+    rent_info = RentInformation.objects.get(id=rent_id)
+    if rent_info.username != username:
+        return JsonResponse({"error": "rent_info belongs to other user!"})
+    if not User.objects.filter(username=rent_info.lessor_name).exists:
+        return JsonResponse({"error": "lessor deleted..."})
+    lessor = User.objects.get(username=rent_info.lessor_name)
+    eva = Evaluation()
+    eva.user_id = user_id
+    eva.username = username
+    eva.equip_id = int(request.POST['equip_id'])
+    eva.content = request.POST['content']
+    eva.score = int(request.POST['score'])
+    eva.save()
+
+    rent_info.status = 'evaluated'
+    rent_info.save()
+
+    add_message('lessor', user_id, lessor.id,
+                '用户[' + saved_user.username + ']对设备[' + rent_info.equip_name + ']发表评价',
+                eva.content)
+    add_message('sys', 0, 0,
+                '用户[' + saved_user.username + ']对设备[' + rent_info.equip_name + ']发表评价',
+                eva.content)
+
+    return JsonResponse({'message': 'ok'})
+
+
+def query_evaluation(request):
+    if request.method != 'GET':
+        return JsonResponse({"error": "require GET"})
+
+    if not check_login(request):
+        return JsonResponse({"error": "please login"})
+    saved_user = User.objects.get(rand_str=request.META['HTTP_JWT'])
+    print("user querying evaluation: ", saved_user.username)
+
+    all_index = ['equip_id']
+    for index in all_index:
+        if index not in request.GET or len(request.GET[index]) == 0:
+            return JsonResponse({"error": "invalid parameters"})
+    equip_id = int(request.GET['equip_id'])
+    result_list = Evaluation.objects.filter(equip_id=equip_id).order_by('-id')
+    return_list = []
+    for item in result_list:
+        return_list.append({'username': item.username, 'content': item.content, 'score': item.score, 'time': item.time})
+
+    return JsonResponse({'total': len(result_list), 'evaluation_list': return_list})
 
 
 def check_login(request):
