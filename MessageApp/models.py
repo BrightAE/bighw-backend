@@ -14,6 +14,7 @@ class Message(models.Model):
 
 class Evaluation(models.Model):
     user_id = models.IntegerField(default=0)
+    username = models.CharField(max_length=200, default='default_username')
     equip_id = models.IntegerField(default=0)
     content = models.TextField(max_length=200, default='default_content')
     score = models.IntegerField(default=0)
