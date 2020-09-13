@@ -201,7 +201,7 @@ def rent_request_delete(request):
             rent_req_id = request.POST.get('rent_req_id')
             rent_req = RentRequest.objects.get(id=rent_req_id)
             rent_req.delete()
-            add_message('sys', 0, 0, '删除租借申请', '删除了租借申请，申请id：'+rent_req.id)
+            add_message('sys', 0, 0, '删除租借申请', '删除了租借申请，申请id：'+str(rent_req.id))
         except:
             return JsonResponse({"error": "no such a rent request"})
     return JsonResponse({"error": "wrong request method"})
@@ -235,7 +235,7 @@ def rent_request_add(request):
             start_time=start_time,
             return_time=return_time
         )
-        add_message('sys', user.id, 0, '添加租借申请', '用户'+user.id+'申请租借设备'+equip.equip_name)
+        add_message('sys', user.id, 0, '添加租借申请', '用户'+user.username+'申请租借设备'+equip.equip_name)
         rent_req.save()
         return JsonResponse({"message": "ok"})
     return JsonResponse({"error": "wrong request method"})
