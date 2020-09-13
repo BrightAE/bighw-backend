@@ -19,7 +19,7 @@ filter是虚的，拆开的话不留filter
    	'filter': 'None' / 'lessor' //设置是否只显示租借者信息
    	'page':
    	'page_size':
-   	'sort_key': // 可不传,有的话应为'equip_sum'/'contribution'/'activity'之一 ,表示根据拥有设备总数/租出设备总次数/借入设备总次数排序
+   	'sorted_by': // 可不传,有的话应为'equip_sum'/'contribution'/'activity'之一 ,表示根据拥有设备总数/租出设备总次数/借入设备总次数排序
    }
    Response:
    {
