@@ -483,7 +483,7 @@ def add_evaluation(request):
         return JsonResponse({"error": "no such rent information"})
 
     user_id = int(request.POST['user_id'])
-    username = int(request.POST['username'])
+    username = request.POST['username']
     if user_id != saved_user.id or username != saved_user.username:
         return JsonResponse({"error": "not current user"})
     rent_info = RentInformation.objects.get(id=rent_id)
