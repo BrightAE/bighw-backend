@@ -190,7 +190,17 @@ def rent_request_decide(request):
 
 def rent_request_delete(request):
     if request.method == 'POST':
-        pass
+        if judge_cookie(request) is False:
+            return JsonResponse({"error": "please loggin"})
+        if 'rent_req_id' not in request.POST:
+            return JsonResponse({"error": "invalid parameters"})
+        try:
+            rent_req_id = request.POST.get('rent_req_id')
+            rent_req = RentRequest.objects.get(id=rent_req_id)
+            rent_req.delete()
+            add_message('sys', 0, 0, '删除租借申请', '删除了租借申请，申请id：'+rent_req.id)
+        except:
+            return JsonResponse({"error": "no such a rent request"})
     return JsonResponse({"error": "wrong request method"})
 
 def rent_request_add(request):
